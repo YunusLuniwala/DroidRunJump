@@ -10,11 +10,11 @@ import com.machinezilla.Chasm;
 
 public class Game {
 
-	final int MAX_CHASMS = 5;
+	final int MAX_CHASMS = 10;
 	Chasm [] chasms;
 	Droid droid = new Droid(this);
 
-	boolean jump;
+	boolean playerTap;
 	long spawnChasmTicks;
 	float lastWidth = 0;
 
@@ -97,7 +97,7 @@ public class Game {
 	}
 	
 	public void doTouch() {
-		jump = true;
+		playerTap = true;
 	}
 
 
@@ -105,7 +105,7 @@ public class Game {
 		tapToStartTime = System.currentTimeMillis();
 		showTapToStart = true;
 		
-		jump = false;
+		playerTap = false;
 		
 		lastWidth = 0;
 		
@@ -188,15 +188,14 @@ public class Game {
 
 	private void gameMenu(Canvas canvas) {
 
-		//textSize(48);
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, greenPaint);
 
 
-		if (jump) {
+		if (playerTap) {
 			gameState = GAME_READY;
-			jump = false;
+			playerTap = false;
 			getReadyGoState = SHOW_GET_READY;
 			getReadyGoTime = System.currentTimeMillis();
 		}
@@ -208,7 +207,6 @@ public class Game {
 		}
 
 		if (showTapToStart) {
-			//textSize(36);				
 			canvas.drawText("TAP TO START", width/3, height-100.0f, greenPaint);
 		}			
 	}

@@ -68,9 +68,9 @@ class Droid {
 			}
 		}
 
-		if (game.jump && !jumping && !falling) {
+		if (game.playerTap && !jumping && !falling) {
 			jumping = true;
-			game.jump = false;
+			game.playerTap = false;
 			vy = 15.0f;
 		}
 	}
