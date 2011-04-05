@@ -26,8 +26,14 @@ public class Game {
 
 	int gameState;
 
-	long showTime;
-	boolean show;
+	long tapToStartTime;
+	boolean showTapToStart;
+	
+	final int SHOW_GET_READY = 0;
+	final int SHOW_GO = 1;
+	
+	long getReadyGoTime;
+	int getReadyGoState;
 
 	Paint textPaint;
 	Paint clearPaint;
@@ -35,8 +41,8 @@ public class Game {
 	
 	Random rng;
 	
-	int canvasWidth;
-	int canvasHeight;
+	int width;
+	int height;
 	
 	public Game() {
 		
@@ -52,8 +58,8 @@ public class Game {
 		
 		rng = new Random();
 		
-		showTime = System.currentTimeMillis();
-		show = true;
+		tapToStartTime = System.currentTimeMillis();
+		showTapToStart = true;
 		
 		droid = new Droid(this);
 		
@@ -63,8 +69,11 @@ public class Game {
 		}
 
 		resetGame();
-		
-		gameState = GAME_MENU;
+	}
+
+	public void setScreenSize(int width, int height) {
+		this.width = width;
+		this.height = height;
 	}
 
 	public void doDraw(Canvas canvas) {
@@ -86,42 +95,53 @@ public class Game {
 			break;
 		}
 	}
+	
+	public void doTouch() {
+		jump = true;
+	}
 
 
 	private void resetGame() {
-		showTime = System.currentTimeMillis();
-		show = true;
+		tapToStartTime = System.currentTimeMillis();
+		showTapToStart = true;
+		
 		jump = false;
+		
 		lastWidth = 0;
+		
 		spawnChasmTicks = System.currentTimeMillis();
+		
 		droid.reset();
+		
 		for (Chasm c : chasms) {
 			c.reset();
 		}
+		
+		gameState = GAME_MENU;
+		
+		getReadyGoState = SHOW_GET_READY;
+		getReadyGoTime = 0;
 	}
 
 	private void gameOver(Canvas canvas) {
 		//textSize(48);
-		canvas.drawRect(0, 0, canvasWidth, canvasHeight, clearPaint);
-		canvas.drawText("GAME OVER", canvasWidth/3, canvasHeight/2, greenPaint);
+		canvas.drawRect(0, 0, width, height, clearPaint);
+		canvas.drawText("GAME OVER", width/3, height/2, greenPaint);
 
-		long now = System.currentTimeMillis() - showTime;
+		long now = System.currentTimeMillis() - tapToStartTime;
 		if (now > 2000) {
-			gameState = GAME_MENU;
 			resetGame();
 		}
 	}
 
 	private void gamePause(Canvas canvas) {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void gamePlay(Canvas canvas) {
-		canvas.drawRect(0, 0, canvasWidth, canvasHeight, clearPaint);
+		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		// draw ground
-		canvas.drawRect(0, 400, canvasWidth, 420, greenPaint);
+		canvas.drawRect(0, 400, width, 420, greenPaint);
 
 		droid.update();
 		droid.draw(canvas);
@@ -137,42 +157,68 @@ public class Game {
 	}
 
 	private void gameReady(Canvas canvas) {
-		// TODO Auto-generated method stub
-		gameState = GAME_PLAY;			
+		
+		long now;
+		
+		canvas.drawRect(0, 0, width, height, clearPaint);
+		
+		switch (getReadyGoState) {
+		case SHOW_GET_READY:
+			canvas.drawText("GET READY", (width/2)-100.0f, height/2, greenPaint);
+			now = System.currentTimeMillis() - getReadyGoTime;
+			if (now > 1000) {
+				getReadyGoTime = System.currentTimeMillis();
+				getReadyGoState = SHOW_GO;
+			}
+			break;
+		case SHOW_GO:
+			canvas.drawText("GO!", (width/2)-40.0f, height/2, greenPaint);
+			now = System.currentTimeMillis() - getReadyGoTime;
+			if (now > 500) {				
+				gameState = GAME_PLAY;
+			}
+			break;
+		}
+		
+		// draw ground
+		canvas.drawRect(0, 400, width, 420, greenPaint);
+		
+		droid.draw(canvas);					
 	}
 
 	private void gameMenu(Canvas canvas) {
 
 		//textSize(48);
-		canvas.drawRect(0, 0, canvasWidth, canvasHeight, clearPaint);
+		canvas.drawRect(0, 0, width, height, clearPaint);
 
-		canvas.drawText("DROID-RUN-JUMP", (canvasWidth/3)-40.0f, 100.0f, greenPaint);
+		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, greenPaint);
 
 
 		if (jump) {
 			gameState = GAME_READY;
 			jump = false;
+			getReadyGoState = SHOW_GET_READY;
+			getReadyGoTime = System.currentTimeMillis();
 		}
 
-		long now = System.currentTimeMillis() - showTime;
+		long now = System.currentTimeMillis() - tapToStartTime;
 		if (now > 550) {
-			showTime = System.currentTimeMillis();
-			show = !show;
+			tapToStartTime = System.currentTimeMillis();
+			showTapToStart = !showTapToStart;
 		}
 
-		if (show) {
+		if (showTapToStart) {
 			//textSize(36);				
-			canvas.drawText("TAP TO START", canvasWidth/3, canvasHeight-100.0f, greenPaint);
+			canvas.drawText("TAP TO START", width/3, height-100.0f, greenPaint);
 		}			
 	}
-
 
 	public float random(float a) {
 		return rng.nextFloat() * a;
 	}
 
-	public float random(float a, float b) {
-		return a + (rng.nextFloat() * b);
+	public float random(float a, float b) {		
+		return a + (rng.nextFloat() * (b - a));
 	}
 
 	void spawnChasm() {
@@ -192,4 +238,5 @@ public class Game {
 			spawnChasmTicks = System.currentTimeMillis();
 		}
 	}
+
 }

@@ -18,13 +18,13 @@ class Chasm {
 	}
 
 	public void reset() {
-		x = game.canvasWidth;
+		x = game.width;
 		alive = false;
 	}
 
 	public void spawn() {
 		w = game.random(100, 201);
-		x = game.canvasWidth + w + game.lastWidth;
+		x = game.width + w + game.lastWidth;
 		game.lastWidth = w + 10.0f;
 		alive = true;
 	}

@@ -1,10 +1,7 @@
 package com.machinezilla;
 
-import java.util.Random;
-
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -25,9 +22,8 @@ public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Call
 		}
 		
 		public void setSurfaceSize(int width, int height) {
-			synchronized (surfaceHolder) {				
-				game.canvasWidth = width;
-				game.canvasHeight = height;
+			synchronized (surfaceHolder) {
+				game.setScreenSize(width, height);
 			}
 		}
 		
@@ -85,7 +81,7 @@ public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Call
 			synchronized (surfaceHolder) {
 				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
-					game.jump = true;
+					game.doTouch();
 					handled = true;
 					break;
 				}

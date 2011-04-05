@@ -43,7 +43,7 @@ class Droid {
 
 				if ((c.x < lx) && ((c.x + c.w) > rx) && (c.y <= ey)) {
 					game.gameState = game.GAME_OVER;
-					game.showTime = System.currentTimeMillis();
+					game.tapToStartTime = System.currentTimeMillis();
 				}
 			}
 		}
