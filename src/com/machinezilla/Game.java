@@ -13,6 +13,8 @@ public class Game {
 	final int MAX_CHASMS = 10;
 	Chasm [] chasms;
 	Droid droid = new Droid(this);
+	final float groundY = 400;
+	final float groundHeight = 20;
 
 	boolean playerTap;
 	long spawnChasmTicks;
@@ -143,7 +145,7 @@ public class Game {
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		// draw ground
-		canvas.drawRect(0, 400, width, 420, greenPaint);
+		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
 
 		droid.update();
 		droid.draw(canvas);
