@@ -12,6 +12,9 @@ class Droid {
 	boolean jumping;
 	boolean falling;
 	
+	final float w = 40.0f;
+	final float h = 45.0f;
+	
 	Game game;
 
 	public Droid(Game game) {
@@ -22,8 +25,8 @@ class Droid {
 	public void reset() {
 		jumping = false;
 		falling = false;
-		x = 400.0f;
-		y = 375.0f;
+		x = 380.0f;
+		y = 352.5f;
 		prevY = y;
 	}
 
@@ -31,15 +34,15 @@ class Droid {
 
 		if (!jumping) {
 
-			float ey = y + 25.0f;
+			float ey = y + h + 2.5f;
 
 			for (Chasm c : game.chasms) {
 				if (!c.alive) {
 					continue;
 				}
 
-				float lx = x - 20.0f;
-				float rx = x + 20.0f;
+				float lx = x;
+				float rx = x + w;
 
 				if ((c.x < lx) && ((c.x + c.w) > rx) && (c.y <= ey)) {
 					game.gameState = game.GAME_OVER;
@@ -52,8 +55,9 @@ class Droid {
 			prevY = y;
 			vy += 1.0f;
 			y += vy;
-			if (y > 380.0f) {
-				y = 375.0f;
+			float tmpY = y + h;
+			if (tmpY > 400.0f) {
+				y = 352.5f;
 				falling = false;
 			}
 		}
@@ -76,6 +80,6 @@ class Droid {
 	}
 
 	public void draw(Canvas canvas) {
-		canvas.drawRect(x - 20.0f, y - 22.5f, x + 20.0f, y + 22.5f, game.greenPaint);
+		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
 	}
 }
