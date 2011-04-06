@@ -121,6 +121,7 @@ public class Game {
 		
 		getReadyGoState = SHOW_GET_READY;
 		getReadyGoTime = 0;
+		
 	}
 
 	private void gameOver(Canvas canvas) {
@@ -135,6 +136,7 @@ public class Game {
 	}
 
 	private void gamePause(Canvas canvas) {
+		// TODO implement pause
 	}
 
 	private void gamePlay(Canvas canvas) {
@@ -198,6 +200,9 @@ public class Game {
 			playerTap = false;
 			getReadyGoState = SHOW_GET_READY;
 			getReadyGoTime = System.currentTimeMillis();
+
+			// spawn 1st chasm so player sees something at start of game
+			chasms[0].spawn();
 		}
 
 		long now = System.currentTimeMillis() - tapToStartTime;
