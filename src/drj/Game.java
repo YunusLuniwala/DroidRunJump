@@ -1,24 +1,25 @@
-package com.machinezilla;
+package drj;
 
 import java.util.Random;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.machinezilla.Droid;
-import com.machinezilla.Chasm;
+import drj.Chasm;
+import drj.Droid;
 
 public class Game {
 
 	final int MAX_CHASMS = 10;
 	Chasm [] chasms;
+	Chasm lastChasm;
+	
 	Droid droid = new Droid(this);
 	final float groundY = 400;
 	final float groundHeight = 20;
 
 	boolean playerTap;
 	long spawnChasmTicks;
-	float lastWidth = 0;
 
 	final int GAME_MENU = 0;
 	final int GAME_READY = 1;
@@ -69,7 +70,7 @@ public class Game {
 		for (int i=0; i<MAX_CHASMS; i++) {
 			chasms[i] = new Chasm(this);
 		}
-
+		
 		resetGame();
 	}
 
@@ -109,8 +110,6 @@ public class Game {
 		
 		playerTap = false;
 		
-		lastWidth = 0;
-		
 		spawnChasmTicks = System.currentTimeMillis();
 		
 		droid.reset();
@@ -118,6 +117,8 @@ public class Game {
 		for (Chasm c : chasms) {
 			c.reset();
 		}
+		
+		lastChasm = null;
 		
 		gameState = GAME_MENU;
 		
@@ -204,7 +205,8 @@ public class Game {
 			getReadyGoTime = System.currentTimeMillis();
 
 			// spawn 1st chasm so player sees something at start of game
-			chasms[0].spawn();
+			chasms[0].spawn(0);
+			lastChasm = chasms[0];
 		}
 
 		long now = System.currentTimeMillis() - tapToStartTime;
@@ -223,7 +225,7 @@ public class Game {
 	}
 
 	public float random(float a, float b) {		
-		return a + (rng.nextFloat() * (b - a));
+		return Math.round(a + (rng.nextFloat() * (b - a)));
 	}
 
 	void spawnChasm() {
@@ -231,10 +233,30 @@ public class Game {
 
 		if (now > 750) {
 
-			if ((int)random(10) > 3) {
+			if ((int)random(10) > 2) {
 				for (Chasm c : chasms) {
 					if (!c.alive) {
-						c.spawn();
+						
+						float xOffset = 0.0f;
+						
+						if (lastChasm.alive) {
+							
+							float tmp = lastChasm.x + lastChasm.w;
+							
+							if (tmp > width) {
+								tmp = tmp - width;
+								xOffset = tmp + random(10.0f);
+							}
+							else {
+								tmp = width - tmp;								
+								if (tmp < 20.0f) {
+									xOffset = tmp + random(10.0f);
+								}
+							}
+						}
+	
+						c.spawn(xOffset);						
+						lastChasm = c;						
 						break;
 					}
 				}
@@ -243,5 +265,4 @@ public class Game {
 			spawnChasmTicks = System.currentTimeMillis();
 		}
 	}
-
 }

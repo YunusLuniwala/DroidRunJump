@@ -1,7 +1,7 @@
-package com.machinezilla;
+package drj;
 
 import android.graphics.Canvas;
-import com.machinezilla.Chasm;
+import drj.Chasm;
 
 class Droid {
 

@@ -1,4 +1,4 @@
-package com.machinezilla;
+package drj;
 
 import android.graphics.Canvas;
 
@@ -17,15 +17,13 @@ class Chasm {
 		this.game = game; 
 	}
 
-	public void reset() {
-		x = game.width;
+	public void reset() {		
 		alive = false;
 	}
 
-	public void spawn() {
+	public void spawn(float xOffset) {
 		w = game.random(100, 201);
-		x = game.width + w + game.lastWidth;
-		game.lastWidth = w + 10.0f;
+		x = game.width + w + xOffset;
 		alive = true;
 	}
 
