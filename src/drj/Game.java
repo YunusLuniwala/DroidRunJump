@@ -20,6 +20,7 @@ public class Game {
 
 	boolean playerTap;
 	long spawnChasmTicks;
+	final long SPAWN_TIME = 750;
 
 	final int GAME_MENU = 0;
 	final int GAME_READY = 1;
@@ -126,6 +127,11 @@ public class Game {
 		getReadyGoTime = 0;
 		
 	}
+	
+	public void initGameOver() {
+		gameState = GAME_OVER;
+		tapToStartTime = System.currentTimeMillis();		
+	}
 
 	private void gameOver(Canvas canvas) {
 		//textSize(48);
@@ -186,7 +192,7 @@ public class Game {
 		}
 		
 		// draw ground
-		canvas.drawRect(0, 400, width, 420, greenPaint);
+		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
 		
 		droid.draw(canvas);					
 	}
@@ -196,7 +202,6 @@ public class Game {
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, greenPaint);
-
 
 		if (playerTap) {
 			gameState = GAME_READY;
@@ -231,7 +236,7 @@ public class Game {
 	void spawnChasm() {
 		long now = System.currentTimeMillis() - spawnChasmTicks;
 
-		if (now > 750) {
+		if (now > SPAWN_TIME) {
 
 			if ((int)random(10) > 2) {
 				for (Chasm c : chasms) {
