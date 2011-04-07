@@ -10,11 +10,11 @@ class Chasm {
 	
 	Game game;
 
-	public Chasm(Game game) {
-		h = 20.0f;
-		y = 400.0f;
+	public Chasm(Game game) {		
 		alive = false;
-		this.game = game; 
+		this.game = game;
+		y = game.groundY;
+		h = game.groundHeight;
 	}
 
 	public void reset() {		
