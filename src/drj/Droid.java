@@ -1,7 +1,7 @@
 package drj;
 
 import android.graphics.Canvas;
-import drj.Chasm;
+import drj.Pothole;
 
 class Droid {
 
@@ -40,15 +40,15 @@ class Droid {
 
 			float ey = y + h + yAdjust;
 
-			for (Chasm c : game.chasms) {
-				if (!c.alive) {
+			for (Pothole p : game.potholes) {
+				if (!p.alive) {
 					continue;
 				}
 
 				float lx = x;
 				float rx = x + w;
 
-				if ((c.x < lx) && ((c.x + c.w) > rx) && (c.y <= ey)) {
+				if ((p.x < lx) && ((p.x + p.w) > rx) && (p.y <= ey)) {
 					game.initGameOver();
 				}
 			}

@@ -5,14 +5,14 @@ import java.util.Random;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import drj.Chasm;
+import drj.Pothole;
 import drj.Droid;
 
 public class Game {
 
-	final int MAX_CHASMS = 10;
-	Chasm [] chasms;
-	Chasm lastChasm;
+	final int MAX_potholes = 10;
+	Pothole [] potholes;
+	Pothole lastPothole;
 	
 	Droid droid = new Droid(this);
 	final float groundY = 400;
@@ -67,9 +67,9 @@ public class Game {
 		
 		droid = new Droid(this);
 		
-		chasms = new Chasm[MAX_CHASMS];
-		for (int i=0; i<MAX_CHASMS; i++) {
-			chasms[i] = new Chasm(this);
+		potholes = new Pothole[MAX_potholes];
+		for (int i=0; i<MAX_potholes; i++) {
+			potholes[i] = new Pothole(this);
 		}
 		
 		resetGame();
@@ -115,11 +115,11 @@ public class Game {
 		
 		droid.reset();
 		
-		for (Chasm c : chasms) {
+		for (Pothole c : potholes) {
 			c.reset();
 		}
 		
-		lastChasm = null;
+		lastPothole = null;
 		
 		gameState = GAME_MENU;
 		
@@ -157,10 +157,10 @@ public class Game {
 		droid.update();
 		droid.draw(canvas);
 
-		for (Chasm c : chasms) {
-			if (c.alive) {
-				c.update();
-				c.draw(canvas);
+		for (Pothole p : potholes) {
+			if (p.alive) {
+				p.update();
+				p.draw(canvas);
 			}
 		}
 
@@ -210,8 +210,8 @@ public class Game {
 			getReadyGoTime = System.currentTimeMillis();
 
 			// spawn 1st chasm so player sees something at start of game
-			chasms[0].spawn(0);
-			lastChasm = chasms[0];
+			potholes[0].spawn(0);
+			lastPothole = potholes[0];
 		}
 
 		long now = System.currentTimeMillis() - tapToStartTime;
@@ -239,14 +239,14 @@ public class Game {
 		if (now > SPAWN_TIME) {
 
 			if ((int)random(10) > 2) {
-				for (Chasm c : chasms) {
-					if (!c.alive) {
+				for (Pothole p : potholes) {
+					if (!p.alive) {
 						
 						float xOffset = 0.0f;
 						
-						if (lastChasm.alive) {
+						if (lastPothole.alive) {
 							
-							float tmp = lastChasm.x + lastChasm.w;
+							float tmp = lastPothole.x + lastPothole.w;
 							
 							if (tmp > width) {
 								tmp = tmp - width;
@@ -260,8 +260,8 @@ public class Game {
 							}
 						}
 	
-						c.spawn(xOffset);						
-						lastChasm = c;						
+						p.spawn(xOffset);						
+						lastPothole = p;						
 						break;
 					}
 				}

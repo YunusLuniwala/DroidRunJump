@@ -2,7 +2,7 @@ package drj;
 
 import android.graphics.Canvas;
 
-class Chasm {
+class Pothole {
 
 	float x, y;
 	float w, h;
@@ -10,7 +10,7 @@ class Chasm {
 	
 	Game game;
 
-	public Chasm(Game game) {		
+	public Pothole(Game game) {		
 		alive = false;
 		this.game = game;
 		y = game.groundY;
