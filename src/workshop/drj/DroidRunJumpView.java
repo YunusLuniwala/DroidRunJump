@@ -1,4 +1,4 @@
-package drj;
+package workshop.drj;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Callback {
+public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callback {
 
 	class DroidRunJumpThread extends Thread {
 		
@@ -31,21 +31,6 @@ public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Call
 			run = b;
 		}
 		
-		public void pause() {
-			synchronized (surfaceHolder) {
-			}
-		}
-		
-		public void unpause() {
-			synchronized (surfaceHolder) {			
-			}
-		}
-		
-		public synchronized void restoreState(Bundle savedState) {
-			synchronized (surfaceHolder) {
-			}
-		}
-		
 		@Override
 		public void run() {
 			while (run) {
@@ -53,7 +38,7 @@ public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Call
 				try {
 					c = surfaceHolder.lockCanvas(null);
 					synchronized (surfaceHolder) {
-						doDraw(c);
+						game.run(c);
 					}
 				} finally {
 					if (c != null) {
@@ -63,18 +48,7 @@ public class DroidRunJumpView  extends SurfaceView implements SurfaceHolder.Call
 			}
 		}
 		
-		public Bundle saveState(Bundle map) {
-			synchronized (surfaceHolder) {
-				if (map != null) {					
-				}
-			}
-			return map;
-		}
 				
-		private void doDraw(Canvas canvas) {
-			game.doDraw(canvas);
-		}
-
 		boolean doTouchEvent(MotionEvent event) {
 			boolean handled = false;
 

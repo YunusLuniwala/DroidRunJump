@@ -1,4 +1,4 @@
-package drj;
+package workshop.drj;
 
 import com.machinezilla.R;
 

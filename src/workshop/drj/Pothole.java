@@ -1,4 +1,4 @@
-package drj;
+package workshop.drj;
 
 import android.graphics.Canvas;
 

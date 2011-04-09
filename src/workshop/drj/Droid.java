@@ -1,7 +1,7 @@
-package drj;
+package workshop.drj;
 
+import workshop.drj.Pothole;
 import android.graphics.Canvas;
-import drj.Pothole;
 
 class Droid {
 

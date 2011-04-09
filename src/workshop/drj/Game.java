@@ -1,12 +1,13 @@
-package drj;
+package workshop.drj;
 
 import java.util.Random;
+
+import workshop.drj.Droid;
+import workshop.drj.Pothole;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import drj.Pothole;
-import drj.Droid;
 
 public class Game {
 
@@ -25,8 +26,7 @@ public class Game {
 	final int GAME_MENU = 0;
 	final int GAME_READY = 1;
 	final int GAME_PLAY = 2;
-	final int GAME_PAUSE = 3;
-	final int GAME_OVER = 4;
+	final int GAME_OVER = 3;
 
 	int gameState;
 
@@ -80,7 +80,7 @@ public class Game {
 		this.height = height;
 	}
 
-	public void doDraw(Canvas canvas) {
+	public void run(Canvas canvas) {
 		switch (gameState) {
 		case GAME_MENU:
 			gameMenu(canvas);
@@ -90,9 +90,6 @@ public class Game {
 			break;
 		case GAME_PLAY:
 			gamePlay(canvas);
-			break;
-		case GAME_PAUSE:
-			gamePause(canvas);
 			break;
 		case GAME_OVER:
 			gameOver(canvas);
@@ -115,8 +112,8 @@ public class Game {
 		
 		droid.reset();
 		
-		for (Pothole c : potholes) {
-			c.reset();
+		for (Pothole p : potholes) {
+			p.reset();
 		}
 		
 		lastPothole = null;
@@ -144,10 +141,6 @@ public class Game {
 		}
 	}
 
-	private void gamePause(Canvas canvas) {
-		// TODO implement pause
-	}
-
 	private void gamePlay(Canvas canvas) {
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
@@ -164,7 +157,7 @@ public class Game {
 			}
 		}
 
-		spawnChasm();
+		spawnPothole();
 	}
 
 	private void gameReady(Canvas canvas) {
@@ -233,37 +226,39 @@ public class Game {
 		return Math.round(a + (rng.nextFloat() * (b - a)));
 	}
 
-	void spawnChasm() {
+	void spawnPothole() {
 		long now = System.currentTimeMillis() - spawnChasmTicks;
 
 		if (now > SPAWN_TIME) {
 
 			if ((int)random(10) > 2) {
 				for (Pothole p : potholes) {
-					if (!p.alive) {
+					
+					if (p.alive) {
+						continue;
+					}
+					
+					float xOffset = 0.0f;
+					
+					if (lastPothole.alive) {
 						
-						float xOffset = 0.0f;
+						float tmp = lastPothole.x + lastPothole.w;
 						
-						if (lastPothole.alive) {
-							
-							float tmp = lastPothole.x + lastPothole.w;
-							
-							if (tmp > width) {
-								tmp = tmp - width;
+						if (tmp > width) {
+							tmp = tmp - width;
+							xOffset = tmp + random(10.0f);
+						}
+						else {
+							tmp = width - tmp;								
+							if (tmp < 20.0f) {
 								xOffset = tmp + random(10.0f);
 							}
-							else {
-								tmp = width - tmp;								
-								if (tmp < 20.0f) {
-									xOffset = tmp + random(10.0f);
-								}
-							}
 						}
-	
-						p.spawn(xOffset);						
-						lastPothole = p;						
-						break;
 					}
+
+					p.spawn(xOffset);						
+					lastPothole = p;						
+					break;
 				}
 			}
 
