@@ -1,4 +1,4 @@
-package workshop.drj;
+package com.android.sofla.drj;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -1,9 +1,10 @@
-package workshop.drj;
+package com.android.sofla.drj;
 
 import java.util.Random;
 
-import workshop.drj.Droid;
-import workshop.drj.Pothole;
+import com.android.sofla.drj.Droid;
+import com.android.sofla.drj.Pothole;
+
 
 import android.graphics.Canvas;
 import android.graphics.Paint;

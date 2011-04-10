@@ -5,7 +5,7 @@
     <uses-sdk android:minSdkVersion="8" />
 
     <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name="workshop.drj.DroidRunJump"
+        <activity android:name="com.android.sofla.drj.DroidRunJump"
                   android:label="@string/app_name"
                   android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                   android:screenOrientation="landscape">
