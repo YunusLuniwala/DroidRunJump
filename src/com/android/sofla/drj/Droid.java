@@ -76,6 +76,9 @@ class Droid {
 		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
 	}
 	
+	//
+	// helper methods for workshop - not to be implemented by participants
+	//
 	private void doCollisionDetection() {
 
 		float ey = y + h + yAdjust;
@@ -100,8 +103,7 @@ class Droid {
 				
 				) {
 				
-				game.initGameOver();
-				
+				game.initGameOver();				
 			}
 		}		
 	}
