@@ -15,6 +15,10 @@ class Droid {
 	final float w = 40.0f;
 	final float h = 45.0f;
 	
+	final float startX = 380.0f;
+	final float startY = 352.5f;
+	final float initialVelocity = 15.0f;
+	
 	float yAdjust;
 	
 	Game game;
@@ -25,10 +29,12 @@ class Droid {
 	}
 
 	public void reset() {
+		
 		jumping = false;
 		falling = false;
-		x = 380.0f;
-		y = 352.5f;
+		
+		x = startX;
+		y = startY;
 		
 		// since droid is floating a little bit above the ground need
 		// to take this into account for collision purposes
@@ -37,51 +43,92 @@ class Droid {
 
 	public void update() {
 
+		//
+		// first: handle collision detection with potholes
+		//
 		if (!jumping) {
-
-			float ey = y + h + yAdjust;
-
-			for (Pothole p : game.potholes) {
-				if (!p.alive) {
-					continue;
-				}
-
-				float lx = x;
-				float rx = x + w;
-
-				if ((p.x < lx) && ((p.x + p.w) > rx) && (p.y <= ey)) {
-					game.initGameOver();
-				}
-			}
+			doCollisionDetection();
 		}
 
+		//
+		// handle falling
+		//
 		if (falling) {
-			vy += 1.0f;
-			y += vy;
-			float tmpY = y + h;
-			if (tmpY > game.groundY) {
-				y = 352.5f;
-				falling = false;
-			}
+			doPlayerFall();
 		}
 
+		//
+		// handle jumping
+		//
 		if (jumping) {
-			y -= vy;
-			vy -= 1.0f;
-			if (vy <= 0.0f) {
-				jumping = false;
-				falling = true;
-			}
+			doPlayerJump();
 		}
 
+		//
+		// does player want to jump?
+		//
 		if (game.playerTap && !jumping && !falling) {
-			jumping = true;
-			game.playerTap = false;
-			vy = 15.0f;
+			startPlayerJump();
 		}
 	}
 
 	public void draw(Canvas canvas) {
 		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
 	}
+	
+	private void doCollisionDetection() {
+
+		float ey = y + h + yAdjust;
+
+		for (Pothole p : game.potholes) {
+			if (!p.alive) {
+				continue;
+			}
+
+			float lx = x;
+			float rx = x + w;
+
+			if (
+					// am I over the pothole?
+					(p.x < lx) 
+					
+					// am I still inside the pothole?
+					&& ((p.x + p.w) > rx) 
+					
+					// have I fallen into the pothole?
+					&& (p.y <= ey)
+				
+				) {
+				
+				game.initGameOver();
+				
+			}
+		}		
+	}
+	
+	private void doPlayerFall() {
+		vy += 1.0f;
+		y += vy;
+		float tmpY = y + h;
+		if (tmpY > game.groundY) {
+			y = startY;
+			falling = false;
+		}		
+	}
+	
+	private void doPlayerJump() {
+		y -= vy;
+		vy -= 1.0f;
+		if (vy <= 0.0f) {
+			jumping = false;
+			falling = true;
+		}		
+	}
+	
+	private void startPlayerJump() {
+		jumping = true;
+		game.playerTap = false;
+		vy = initialVelocity;		
+	}
+
 }

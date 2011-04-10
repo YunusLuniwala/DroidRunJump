@@ -12,18 +12,35 @@ import android.graphics.Paint;
 
 public class Game {
 
+	//
+	// pothole resources
+	//
 	final int MAX_potholes = 10;
+	float MIN_POTHOLE_WIDTH = 100.0f;
+	float MAX_POTHOLE_WIDTH = 210.0f;
 	Pothole [] potholes;
+	
+	// keep track of last spawned pothole
 	Pothole lastPothole;
 	
+	long spawnPotholeTicks;
+	final long SPAWN_POTHOLE_TIME = 750;
+	
+	//
+	// Droid/Player resources
+	//
 	Droid droid = new Droid(this);
 	final float groundY = 400;
 	final float groundHeight = 20;
 
+	//
+	// player input flag
+	//
 	boolean playerTap;
-	long spawnChasmTicks;
-	final long SPAWN_TIME = 750;
 
+	//
+	// possible game states
+	//
 	final int GAME_MENU = 0;
 	final int GAME_READY = 1;
 	final int GAME_PLAY = 2;
@@ -31,26 +48,49 @@ public class Game {
 
 	int gameState;
 
+	//
+	// game menu message
+	//
 	long tapToStartTime;
 	boolean showTapToStart;
 	
+	//
+	// get ready message
+	//
 	final int SHOW_GET_READY = 0;
 	final int SHOW_GO = 1;
 	
 	long getReadyGoTime;
 	int getReadyGoState;
+	
+	//
+	// game over message
+	//
+	long gameOverTime;
 
+	//
+	// shared paint objects for drawing
+	//
 	Paint textPaint;
 	Paint clearPaint;
 	Paint greenPaint;
 	
+	//
+	// random number generator
+	//
 	Random rng;
 	
+	//
+	// display dimensions
+	//
 	int width;
 	int height;
 	
 	public Game() {
 		
+		//
+		// allocate resources needed by game
+		//
 		greenPaint = new Paint();
 		greenPaint.setAntiAlias(true);
 		greenPaint.setARGB(255, 0, 255, 0);
@@ -61,10 +101,7 @@ public class Game {
 		clearPaint.setARGB(255, 0, 0, 0);
 		clearPaint.setAntiAlias(true);
 		
-		rng = new Random();
-		
-		tapToStartTime = System.currentTimeMillis();
-		showTapToStart = true;
+		rng = new Random();		
 		
 		droid = new Droid(this);
 		
@@ -73,6 +110,9 @@ public class Game {
 			potholes[i] = new Pothole(this);
 		}
 		
+		//
+		// initialize the game
+		//
 		resetGame();
 	}
 
@@ -109,7 +149,7 @@ public class Game {
 		
 		playerTap = false;
 		
-		spawnChasmTicks = System.currentTimeMillis();
+		spawnPotholeTicks = System.currentTimeMillis();
 		
 		droid.reset();
 		
@@ -122,27 +162,29 @@ public class Game {
 		gameState = GAME_MENU;
 		
 		getReadyGoState = SHOW_GET_READY;
-		getReadyGoTime = 0;
-		
+		getReadyGoTime = 0;		
 	}
 	
 	public void initGameOver() {
 		gameState = GAME_OVER;
-		tapToStartTime = System.currentTimeMillis();		
+		gameOverTime = System.currentTimeMillis();		
 	}
 
 	private void gameOver(Canvas canvas) {
-		//textSize(48);
+
+		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
+		
 		canvas.drawText("GAME OVER", width/3, height/2, greenPaint);
 
-		long now = System.currentTimeMillis() - tapToStartTime;
+		long now = System.currentTimeMillis() - gameOverTime;
 		if (now > 2000) {
 			resetGame();
 		}
 	}
 
 	private void gamePlay(Canvas canvas) {
+		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		// draw ground
@@ -165,6 +207,7 @@ public class Game {
 		
 		long now;
 		
+		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
 		
 		switch (getReadyGoState) {
@@ -228,18 +271,36 @@ public class Game {
 	}
 
 	void spawnPothole() {
-		long now = System.currentTimeMillis() - spawnChasmTicks;
+		long now = System.currentTimeMillis() - spawnPotholeTicks;
 
-		if (now > SPAWN_TIME) {
+		if (now > SPAWN_POTHOLE_TIME) {
 
+			// randomly determine whether or not to spawn a new pothole
 			if ((int)random(10) > 2) {
+				
+				//
+				// find an available pothole to use
+				//
+				
 				for (Pothole p : potholes) {
 					
 					if (p.alive) {
 						continue;
 					}
 					
+					//
+					// by default all new potholes start just beyond
+					// the right side of the display
+					//
+					
 					float xOffset = 0.0f;
+					
+					//
+					// if the last pothole is alive then use its width to adjust
+					// the position of the new pothole if the last pothole
+					// is too close to the right of the screen. this is to
+					// give the player some breathing room.
+					//
 					
 					if (lastPothole.alive) {
 						
@@ -263,7 +324,7 @@ public class Game {
 				}
 			}
 
-			spawnChasmTicks = System.currentTimeMillis();
+			spawnPotholeTicks = System.currentTimeMillis();
 		}
 	}
 }

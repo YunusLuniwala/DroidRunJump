@@ -10,13 +10,16 @@ import android.view.SurfaceView;
 
 public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callback {
 
+	//
+	// game thread
+	//
 	class DroidRunJumpThread extends Thread {
 		
 		private SurfaceHolder surfaceHolder;
 		boolean run;
 		Game game;
 		
-		public DroidRunJumpThread(SurfaceHolder surfaceHolder, Context context) {		
+		public DroidRunJumpThread(SurfaceHolder surfaceHolder, Context context) {			
 			this.surfaceHolder = surfaceHolder;
 			game = new Game();
 		}
@@ -33,6 +36,11 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		
 		@Override
 		public void run() {
+			
+			//
+			// game loop
+			//
+			
 			while (run) {
 				Canvas c = null;				
 				try {
@@ -64,7 +72,11 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 			return handled;			
 		}
 	}
+
 	
+	//
+	// game view
+	//
 	private DroidRunJumpThread thread;
 	
 	public DroidRunJumpView(Context context, AttributeSet attrs) {

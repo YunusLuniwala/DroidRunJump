@@ -22,12 +22,23 @@ class Pothole {
 	}
 
 	public void spawn(float xOffset) {
-		w = game.random(100, 201);
+		
+		//
+		// spawn a pothole starting beyond right side of the display
+		// apply additional xOffset and vary the width of the pothole
+		//
+		
+		w = game.random(game.MIN_POTHOLE_WIDTH, game.MAX_POTHOLE_WIDTH);
 		x = game.width + w + xOffset;
 		alive = true;
 	}
 
 	public void update() {
+		
+		//
+		// potholes move from right to left
+		//
+		
 		x -= 10.0f;
 		if (x < -w) {
 			alive = false;
