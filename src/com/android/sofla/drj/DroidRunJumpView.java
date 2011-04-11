@@ -2,7 +2,6 @@ package com.android.sofla.drj;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -85,10 +84,6 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		holder.addCallback(this);		
 		thread = new DroidRunJumpThread(holder, context);		
 		setFocusable(true);		
-	}
-
-	public DroidRunJumpThread getThread() {
-		return thread;
 	}
 
 	@Override
