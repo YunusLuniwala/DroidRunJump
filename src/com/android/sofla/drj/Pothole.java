@@ -40,6 +40,11 @@ class Pothole {
 		//
 		
 		x -= 10.0f;
+		
+		
+		//
+		// if pothole beyond left hand side of display then disable it
+		//
 		if (x < -w) {
 			alive = false;
 		}
