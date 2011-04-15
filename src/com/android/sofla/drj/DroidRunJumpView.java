@@ -71,7 +71,6 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 			return handled;			
 		}
 	}
-
 	
 	//
 	// game view
@@ -83,7 +82,7 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);		
 		thread = new DroidRunJumpThread(holder, context);		
-		setFocusable(true);		
+		setFocusable(true);
 	}
 
 	@Override

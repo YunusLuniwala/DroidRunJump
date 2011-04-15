@@ -1,7 +1,5 @@
 package com.android.sofla.drj;
 
-import com.machinezilla.R;
-
 import android.app.Activity;
 import android.os.Bundle;
 
