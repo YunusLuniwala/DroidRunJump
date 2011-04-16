@@ -85,19 +85,19 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		setFocusable(true);
 	}
 
-	@Override
+	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		thread.setSurfaceSize(width, height);
 	}
 
-	@Override
+	
 	public void surfaceCreated(SurfaceHolder holder) {
 		thread.setRunning(true);
 		thread.start();
 	}
 
-	@Override
+	
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		boolean retry = true;
 		thread.setRunning(false);
