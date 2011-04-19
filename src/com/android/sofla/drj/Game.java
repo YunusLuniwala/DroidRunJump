@@ -2,12 +2,10 @@ package com.android.sofla.drj;
 
 import java.util.Random;
 
-import com.android.sofla.drj.Droid;
-import com.android.sofla.drj.Pothole;
-
-
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 
 
 public class Game {
@@ -23,7 +21,7 @@ public class Game {
 	// keep track of last spawned pothole
 	Pothole lastPothole;
 	
-	long spawnPotholeTicks;
+	long spawnPotholeTime;
 	final long SPAWN_POTHOLE_TIME = 750;
 	
 	//
@@ -45,6 +43,7 @@ public class Game {
 	final int GAME_READY = 1;
 	final int GAME_PLAY = 2;
 	final int GAME_OVER = 3;
+	final int GAME_PAUSE = 4;
 
 	int gameState;
 
@@ -67,6 +66,9 @@ public class Game {
 	// game over message
 	//
 	long gameOverTime;
+	
+	
+	long saveGameTime;
 
 	//
 	// shared paint objects for drawing
@@ -107,7 +109,7 @@ public class Game {
 		
 		potholes = new Pothole[MAX_potholes];
 		for (int i=0; i<MAX_potholes; i++) {
-			potholes[i] = new Pothole(this);
+			potholes[i] = new Pothole(i, this);
 		}
 		
 		//
@@ -135,6 +137,9 @@ public class Game {
 		case GAME_OVER:
 			gameOver(canvas);
 			break;
+		case GAME_PAUSE:
+			gamePause(canvas);
+			break;
 		}
 	}
 	
@@ -149,7 +154,7 @@ public class Game {
 		
 		playerTap = false;
 		
-		spawnPotholeTicks = System.currentTimeMillis();
+		spawnPotholeTime = System.currentTimeMillis();
 		
 		droid.reset();
 		
@@ -160,6 +165,7 @@ public class Game {
 		lastPothole = null;
 		
 		gameState = GAME_MENU;
+		lastGameState = gameState;
 		
 		getReadyGoState = SHOW_GET_READY;
 		getReadyGoTime = 0;		
@@ -271,7 +277,7 @@ public class Game {
 	}
 
 	void spawnPothole() {
-		long now = System.currentTimeMillis() - spawnPotholeTicks;
+		long now = System.currentTimeMillis() - spawnPotholeTime;
 
 		if (now > SPAWN_POTHOLE_TIME) {
 
@@ -324,7 +330,117 @@ public class Game {
 				}
 			}
 
-			spawnPotholeTicks = System.currentTimeMillis();
+			spawnPotholeTime = System.currentTimeMillis();
 		}
+	}
+	
+	//
+	// workshop2 code
+	//
+	
+	int lastGameState;
+	long pauseStartTime;
+	
+	private void gamePause(Canvas canvas) {
+
+		// clear screen
+		canvas.drawRect(0, 0, width, height, clearPaint);
+		
+		canvas.drawText("GAME PAUSED", width/3, height/2, greenPaint);
+		
+		if (playerTap) {
+			playerTap = false;
+			gameState = lastGameState;
+
+			// determine time elapsed between pause and unpause
+			long deltaTime = System.currentTimeMillis() - pauseStartTime;
+			
+			// adjust timer variables based on elapsed time delta 
+			spawnPotholeTime += deltaTime;
+			tapToStartTime += deltaTime;
+			getReadyGoTime += deltaTime;
+			gameOverTime += deltaTime;
+			
+			Log.w("DRJ", "un-Pause game: " + gameState);
+		}
+	}
+	
+	public void pause() {
+		lastGameState = gameState;
+		gameState = GAME_PAUSE;
+		pauseStartTime = System.currentTimeMillis();
+		Log.w("DRJ", "pause method called");
+	}
+		
+	public void restore(SharedPreferences savedState) {
+		
+		Log.w("DRJ", "restore method called");
+		
+		// restore game vars
+		
+		int lastPotholeId = savedState.getInt("game_lastPotHole_id", -1);
+		
+		if (lastPotholeId != -1) {
+			lastPothole = potholes[lastPotholeId];
+		}
+		else {
+			lastPothole = null;
+		}
+		
+		spawnPotholeTime = savedState.getLong("game_spawnPotholeTicks", 0);
+		playerTap = savedState.getBoolean("game_playerTap", false);
+		gameState = savedState.getInt("game_gameState", 0);
+		tapToStartTime = savedState.getLong("game_tapToStartTime", 0);		
+		showTapToStart = savedState.getBoolean("game_showTapToStart", false);
+		getReadyGoTime = savedState.getLong("game_getReadyGoTime", 0);
+		getReadyGoState = savedState.getInt("game_getReadyGoState", 0);
+		gameOverTime = savedState.getLong("game_gameOverTime", 0);
+		
+		lastGameState = savedState.getInt("game_lastGameState", 1);
+		pauseStartTime = savedState.getLong("game_pauseStartTime", 0);
+		
+		// restore game entities		
+		droid.restore(savedState);
+		
+		for (Pothole p : potholes) {
+			p.restore(savedState);
+		}		
+	}
+	
+	public void save(SharedPreferences.Editor map) {
+		
+		if (map == null) {			
+			return;
+		}
+		
+		Log.w("DRJ", "save method called");
+		
+		// save game vars
+		if (lastPothole == null) {
+			map.putInt("game_lastPotHole_id", -1);
+		}
+		else {
+			map.putInt("game_lastPotHole_id", lastPothole.id);
+		}
+		
+		map.putLong("game_spawnPotholeTicks", spawnPotholeTime);
+		map.putBoolean("game_playerTap", playerTap);
+		map.putInt("game_gameState", gameState);
+		map.putLong("game_tapToStartTime", tapToStartTime);
+		map.putBoolean("game_showTapToStart", showTapToStart);
+		map.putLong("game_getReadyGoTime", getReadyGoTime);
+		map.putInt("game_getReadyGoState", getReadyGoState);
+		map.putLong("game_gameOverTime", gameOverTime);
+
+		map.putInt("game_lastGameState", lastGameState);
+		map.putLong("game_pauseStartTime", pauseStartTime);
+		
+		// save game entities
+		
+		droid.save(map);
+		
+		for (Pothole p : potholes) {
+			p.save(map);
+		}				
 	}
 }
