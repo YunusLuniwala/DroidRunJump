@@ -27,9 +27,16 @@ public class Game {
 	//
 	// Droid/Player resources
 	//
-	Droid droid = new Droid(this);
+	Droid droid;
 	final float groundY = 400;
 	final float groundHeight = 20;
+	
+	//
+	// Pastry
+	//
+	Pastry pastry;
+	long spawnPastryTime;
+	final long SPAWN_PASTRY_TIME = 750;
 
 	//
 	// player input flag
@@ -67,8 +74,16 @@ public class Game {
 	//
 	long gameOverTime;
 	
-	
+	//
+	// track time between save games
+	//
 	long saveGameTime;
+	
+	//
+	// hiscore
+	//
+	int highScore;
+	int curScore;
 
 	//
 	// shared paint objects for drawing
@@ -112,6 +127,8 @@ public class Game {
 			potholes[i] = new Pothole(i, this);
 		}
 		
+		pastry = new Pastry(this);
+		
 		//
 		// initialize the game
 		//
@@ -147,20 +164,21 @@ public class Game {
 		playerTap = true;
 	}
 
-
 	private void resetGame() {
 		tapToStartTime = System.currentTimeMillis();
 		showTapToStart = true;
 		
 		playerTap = false;
-		
-		spawnPotholeTime = System.currentTimeMillis();
-		
+
 		droid.reset();
 		
+		spawnPotholeTime = System.currentTimeMillis();
 		for (Pothole p : potholes) {
 			p.reset();
 		}
+		
+		pastry.reset();
+		spawnPastryTime = System.currentTimeMillis();
 		
 		lastPothole = null;
 		
@@ -196,17 +214,23 @@ public class Game {
 		// draw ground
 		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
 
-		droid.update();
-		droid.draw(canvas);
-
 		for (Pothole p : potholes) {
 			if (p.alive) {
 				p.update();
 				p.draw(canvas);
 			}
 		}
+		
+		if (pastry.alive) {
+			pastry.update();
+			pastry.draw(canvas);
+		}
+		
+		droid.update();
+		droid.draw(canvas);
 
 		spawnPothole();
+		spawnPastry();
 	}
 
 	private void gameReady(Canvas canvas) {
@@ -372,11 +396,56 @@ public class Game {
 		Log.w("DRJ", "pause method called");
 	}
 		
+	void spawnPastry() {		
+		long now = System.currentTimeMillis() - spawnPastryTime;
+
+		if (now > SPAWN_PASTRY_TIME) {
+			// randomly determine whether or not to spawn a new pastry
+			if ((int)random(10) > 8) {				
+				if (!pastry.alive) {				
+					pastry.spawn();					
+				}				
+			}			
+			spawnPastryTime = System.currentTimeMillis();
+		}
+	}
+	
+	public void doPlayerEatPastry() {
+		// play eat pastry sound
+		// increase score
+		
+		// reset pastry and spawn time
+		pastry.alive = false;
+		spawnPastryTime = System.currentTimeMillis();
+	}
+		
 	public void restore(SharedPreferences savedState) {
 		
 		Log.w("DRJ", "restore method called");
 		
 		// restore game vars
+		
+		boolean savedGame = savedState.getBoolean("savedGame", false);
+		
+		if (savedGame == false) {
+			
+			//
+			// only need to fetch highscore
+			//
+			
+			
+			return;
+		}
+
+		//
+		// first clear saved game state in case player doesn't do a save when they exit
+		//
+		SharedPreferences.Editor editor = savedState.edit();
+		editor.remove("savedGame");
+				
+		//
+		// now start restoring game variables
+		//
 		
 		int lastPotholeId = savedState.getInt("game_lastPotHole_id", -1);
 		
@@ -399,12 +468,18 @@ public class Game {
 		lastGameState = savedState.getInt("game_lastGameState", 1);
 		pauseStartTime = savedState.getLong("game_pauseStartTime", 0);
 		
+		spawnPastryTime = savedState.getLong("game_spawnPastryTime", 0);
+		
 		// restore game entities		
 		droid.restore(savedState);
 		
 		for (Pothole p : potholes) {
 			p.restore(savedState);
-		}		
+		}
+		
+		pastry.restore(savedState);
+		
+		editor.commit();
 	}
 	
 	public void save(SharedPreferences.Editor map) {
@@ -414,6 +489,8 @@ public class Game {
 		}
 		
 		Log.w("DRJ", "save method called");
+		
+		map.putBoolean("savedGame", true);
 		
 		// save game vars
 		if (lastPothole == null) {
@@ -435,12 +512,21 @@ public class Game {
 		map.putInt("game_lastGameState", lastGameState);
 		map.putLong("game_pauseStartTime", pauseStartTime);
 		
+		map.putLong("game_spawnPastryTime", spawnPastryTime);
+		
 		// save game entities
 		
 		droid.save(map);
 		
 		for (Pothole p : potholes) {
 			p.save(map);
-		}				
+		}
+		
+		pastry.save(map);
+		
+		//
+		// store saved variables
+		//
+		map.commit();
 	}
 }

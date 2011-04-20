@@ -2,6 +2,7 @@ package com.android.sofla.drj;
 
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 
 class Droid {
 
@@ -21,9 +22,12 @@ class Droid {
 	float yAdjust;
 	
 	Game game;
+	
+	RectF rect;
 
 	public Droid(Game game) {
 		this.game = game;
+		this.rect = new RectF();
 		reset();		
 	}
 
@@ -35,6 +39,11 @@ class Droid {
 		x = startX;
 		y = startY;
 		
+		rect.left = x;
+		rect.top = y;
+		rect.bottom = y + h;
+		rect.right = x + w;
+		
 		// since droid is floating a little bit above the ground need
 		// to take this into account for collision purposes
 		yAdjust = game.groundY - y - h; 
@@ -43,11 +52,10 @@ class Droid {
 	public void update() {
 
 		//
-		// first: handle collision detection with potholes
-		//
-		if (!jumping) {
-			doCollisionDetection();
-		}
+		// first: handle collision detection with pastry and potholes
+		//		
+		doCollisionDetection();
+
 
 		//
 		// handle falling
@@ -104,7 +112,19 @@ class Droid {
 				
 				game.initGameOver();				
 			}
-		}		
+		}
+		
+		//
+		// check for pastry collision
+		//
+		rect.left = x;
+		rect.top = y;
+		rect.bottom = y + h;
+		rect.right = x + w;
+		
+		if (game.pastry.alive && rect.intersect(game.pastry.rect)) {
+			game.doPlayerEatPastry();
+		}
 	}
 	
 	private void doPlayerFall() {

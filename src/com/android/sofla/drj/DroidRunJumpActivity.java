@@ -36,11 +36,9 @@ public class DroidRunJumpActivity extends Activity {
     		return;    	
     	}
     	
-   		// save game
-       	editor.putBoolean("savedGame", true);
+   		// save game       	
        	drjView.getThread().pause();
-       	drjView.getThread().saveGame(editor);
-       	editor.commit();
+       	drjView.getThread().saveGame(editor);       	
     }
     
     @Override
@@ -50,12 +48,6 @@ public class DroidRunJumpActivity extends Activity {
     	
     	// restore game
     	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-    	SharedPreferences.Editor editor = settings.edit();    	
-    	boolean savedGame = settings.getBoolean("savedGame", false);    	
-    	if (savedGame) {    		
-    		drjView.getThread().restoreGame(settings);
-    		editor.clear();
-    		editor.commit();
-    	}
+   		drjView.getThread().restoreGame(settings);
     }    
 }
