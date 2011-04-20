@@ -401,7 +401,7 @@ public class Game {
 
 		if (now > SPAWN_PASTRY_TIME) {
 			// randomly determine whether or not to spawn a new pastry
-			if ((int)random(10) > 8) {				
+			if ((int)random(10) > 7) {				
 				if (!pastry.alive) {				
 					pastry.spawn();					
 				}				
