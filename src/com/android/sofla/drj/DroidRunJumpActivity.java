@@ -32,13 +32,14 @@ public class DroidRunJumpActivity extends Activity {
     	
     	if (isFinishing()) {
     		Log.w("DRJ", "is Finishing...");    		
-    		// don't save if user wants to exit
+    		// just save highscore if player is exiting
+    		drjView.getThread().saveGame(editor, true);
     		return;    	
     	}
     	
    		// save game       	
        	drjView.getThread().pause();
-       	drjView.getThread().saveGame(editor);       	
+       	drjView.getThread().saveGame(editor, false);       	
     }
     
     @Override

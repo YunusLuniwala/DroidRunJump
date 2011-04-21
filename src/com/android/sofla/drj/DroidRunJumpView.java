@@ -91,9 +91,9 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 			}
 		}
 
-		public void saveGame(SharedPreferences.Editor editor) {
+		public void saveGame(SharedPreferences.Editor editor, boolean onlyHighScore) {
 			synchronized (surfaceHolder) {
-				game.save(editor);				
+				game.save(editor, onlyHighScore);				
 			}
 		}
 	}

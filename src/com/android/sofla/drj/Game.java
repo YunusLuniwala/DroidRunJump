@@ -84,6 +84,13 @@ public class Game {
 	//
 	int highScore;
 	int curScore;
+	
+	long scoreTime;
+	final long SCORE_TIME = 100;
+	
+	final int SCORE_DEFAULT = 500;
+	final int SCORE_INC = 5;
+	final int SCORE_PASTRY_BONUS = 200;
 
 	//
 	// shared paint objects for drawing
@@ -186,12 +193,20 @@ public class Game {
 		lastGameState = gameState;
 		
 		getReadyGoState = SHOW_GET_READY;
-		getReadyGoTime = 0;		
+		getReadyGoTime = 0;
+		
+		curScore = 0;
 	}
 	
 	public void initGameOver() {
+		
 		gameState = GAME_OVER;
-		gameOverTime = System.currentTimeMillis();		
+		gameOverTime = System.currentTimeMillis();
+		
+		// update high score
+		if (curScore > highScore) {
+			highScore = curScore;
+		}
 	}
 
 	private void gameOver(Canvas canvas) {
@@ -231,6 +246,8 @@ public class Game {
 
 		spawnPothole();
 		spawnPastry();
+		
+		doScore(canvas);		
 	}
 
 	private void gameReady(Canvas canvas) {
@@ -254,9 +271,13 @@ public class Game {
 			now = System.currentTimeMillis() - getReadyGoTime;
 			if (now > 500) {				
 				gameState = GAME_PLAY;
+				scoreTime = System.currentTimeMillis();
 			}
 			break;
 		}
+		
+		// draw blank score
+		canvas.drawText("SCORE: 0", 0, 40, greenPaint);
 		
 		// draw ground
 		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
@@ -269,6 +290,8 @@ public class Game {
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, greenPaint);
+		
+		canvas.drawText("HI SCORE: " + highScore, (width/3)-20.0f, height/2, greenPaint);
 
 		if (playerTap) {
 			gameState = GAME_READY;
@@ -384,6 +407,7 @@ public class Game {
 			tapToStartTime += deltaTime;
 			getReadyGoTime += deltaTime;
 			gameOverTime += deltaTime;
+			scoreTime += deltaTime;
 			
 			Log.w("DRJ", "un-Pause game: " + gameState);
 		}
@@ -412,13 +436,31 @@ public class Game {
 	
 	public void doPlayerEatPastry() {
 		// play eat pastry sound
+		
 		// increase score
+		curScore += SCORE_PASTRY_BONUS;
 		
 		// reset pastry and spawn time
 		pastry.alive = false;
 		spawnPastryTime = System.currentTimeMillis();
 	}
+	
+	public void doScore(Canvas canvas) {
 		
+		// first update current score
+		long now = System.currentTimeMillis() - scoreTime;
+		
+		if (now > SCORE_TIME) {
+			curScore += SCORE_INC;
+			scoreTime = System.currentTimeMillis();
+		}
+		
+		// now draw it the screen
+		StringBuilder buf = new StringBuilder("SCORE: ");
+		buf.append(curScore);		
+		canvas.drawText(buf.toString(), 0, 40, greenPaint);
+	}
+	
 	public void restore(SharedPreferences savedState) {
 		
 		Log.w("DRJ", "restore method called");
@@ -432,7 +474,7 @@ public class Game {
 			//
 			// only need to fetch highscore
 			//
-			
+			highScore = savedState.getInt("game_highScore", SCORE_DEFAULT);
 			
 			return;
 		}
@@ -470,6 +512,9 @@ public class Game {
 		
 		spawnPastryTime = savedState.getLong("game_spawnPastryTime", 0);
 		
+		scoreTime = savedState.getLong("game_scoreTime", 0);
+		curScore = savedState.getInt("game_curScore", 0);
+		
 		// restore game entities		
 		droid.restore(savedState);
 		
@@ -482,13 +527,22 @@ public class Game {
 		editor.commit();
 	}
 	
-	public void save(SharedPreferences.Editor map) {
+	public void save(SharedPreferences.Editor map, boolean onlyHighScore) {
 		
 		if (map == null) {			
 			return;
 		}
 		
 		Log.w("DRJ", "save method called");
+
+		//
+		// only highscore needs to be saved
+		//
+		if (onlyHighScore) {
+			map.putInt("game_highScore", highScore);
+			map.commit();
+			return;			
+		}
 		
 		map.putBoolean("savedGame", true);
 		
@@ -513,6 +567,9 @@ public class Game {
 		map.putLong("game_pauseStartTime", pauseStartTime);
 		
 		map.putLong("game_spawnPastryTime", spawnPastryTime);
+		
+		map.putLong("game_scoreTime", scoreTime);
+		map.putInt("game_curScore", curScore);
 		
 		// save game entities
 		
