@@ -82,6 +82,7 @@ class Droid {
 		//
 		if (game.playerTap && !jumping && !falling) {
 			startPlayerJump();
+			game.soundPool.play(game.droidJumpSnd, 1.0f, 1.0f, 0, 0, 1.0f);
 		}
 		
 		//
@@ -134,7 +135,8 @@ class Droid {
 				
 				) {
 				
-				game.initGameOver();				
+				game.initGameOver();
+				game.soundPool.play(game.droidCrashSnd, 1.0f, 1.0f, 0, 0, 1.0f);
 			}
 		}
 		
@@ -148,6 +150,7 @@ class Droid {
 		
 		if (game.pastry.alive && rect.intersect(game.pastry.rect)) {
 			game.doPlayerEatPastry();
+			game.soundPool.play(game.droidEatPastrySnd, 1.0f, 1.0f, 0, 0, 1.0f);
 		}
 	}
 	

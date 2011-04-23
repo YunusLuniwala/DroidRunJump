@@ -1,5 +1,6 @@
 package com.android.sofla.drj;
 
+import java.io.IOException;
 import java.util.Random;
 
 import android.content.Context;
@@ -9,6 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.util.Log;
 
 
@@ -98,7 +102,7 @@ public class Game {
 	long scoreTime;
 	final long SCORE_TIME = 100;
 	
-	final int SCORE_DEFAULT = 500;
+	final int SCORE_DEFAULT = 5000;
 	final int SCORE_INC = 5;
 	final int SCORE_PASTRY_BONUS = 200;
 
@@ -107,7 +111,7 @@ public class Game {
 	//
 	Paint textPaint;
 	Paint clearPaint;
-	Paint greenPaint;
+	Paint whitePaint;
 	Paint emptyPaint;
 	
 	//
@@ -132,16 +136,25 @@ public class Game {
 	Bitmap [] droidImages;
 	final int MAX_DROID_IMAGES = 4;
 	
+	//
+	// sound
+	//
+	SoundPool soundPool;
+	int droidJumpSnd;
+	int droidEatPastrySnd;
+	int droidCrashSnd;
+	
+
 	public Game(Context context) {
-		
+			
 		//
 		// allocate resources needed by game
 		//
-		greenPaint = new Paint();
-		greenPaint.setAntiAlias(true);
-		greenPaint.setARGB(255, 0, 255, 0);
-		greenPaint.setFakeBoldText(true);		
-		greenPaint.setTextSize(42.0f);
+		whitePaint = new Paint();
+		whitePaint.setAntiAlias(true);
+		whitePaint.setARGB(255, 255, 255, 255);
+		whitePaint.setFakeBoldText(true);		
+		whitePaint.setTextSize(42.0f);
 
 		clearPaint = new Paint();
 		clearPaint.setARGB(255, 0, 0, 0);
@@ -167,11 +180,24 @@ public class Game {
 		
 		road = new Road(this);
 
+		
+		//
+		// load sounds
+		//
+		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+		loadSounds(context);
+		
 				
 		//
 		// initialize the game
 		//
 		resetGame();
+	}
+	
+	private void loadSounds(Context context) {
+		droidCrashSnd = soundPool.load(context, R.raw.droidcrash, 1);
+		droidEatPastrySnd = soundPool.load(context, R.raw.eatpastry, 1);
+		droidJumpSnd = soundPool.load(context, R.raw.droidjump, 1);		
 	}
 	
 	private void loadImages(Context context) {
@@ -265,7 +291,7 @@ public class Game {
 		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
 		
-		canvas.drawText("GAME OVER", width/3, height/2, greenPaint);
+		canvas.drawText("GAME OVER", width/3, height/2, whitePaint);
 
 		long now = System.currentTimeMillis() - gameOverTime;
 		if (now > 2000) {
@@ -313,7 +339,7 @@ public class Game {
 		
 		switch (getReadyGoState) {
 		case SHOW_GET_READY:
-			canvas.drawText("GET READY", (width/2)-100.0f, height/2, greenPaint);
+			canvas.drawText("GET READY", (width/2)-100.0f, height/2, whitePaint);
 			now = System.currentTimeMillis() - getReadyGoTime;
 			if (now > 1000) {
 				getReadyGoTime = System.currentTimeMillis();
@@ -321,7 +347,7 @@ public class Game {
 			}
 			break;
 		case SHOW_GO:
-			canvas.drawText("GO!", (width/2)-40.0f, height/2, greenPaint);
+			canvas.drawText("GO!", (width/2)-40.0f, height/2, whitePaint);
 			now = System.currentTimeMillis() - getReadyGoTime;
 			if (now > 500) {				
 				gameState = GAME_PLAY;
@@ -331,7 +357,7 @@ public class Game {
 		}
 		
 		// draw blank score
-		canvas.drawText("SCORE: 0", 0, 40, greenPaint);
+		canvas.drawText("SCORE: 0", 0, 40, whitePaint);
 		
 		// draw ground
 		//canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
@@ -345,9 +371,9 @@ public class Game {
 
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
-		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, greenPaint);
+		canvas.drawText("DROID-RUN-JUMP", (width/3)-40.0f, 100.0f, whitePaint);
 		
-		canvas.drawText("HI SCORE: " + highScore, (width/3)-20.0f, height/2, greenPaint);
+		canvas.drawText("HI SCORE: " + highScore, (width/3)-20.0f, height/2, whitePaint);
 
 		if (playerTap) {
 			gameState = GAME_READY;
@@ -367,7 +393,7 @@ public class Game {
 		}
 
 		if (showTapToStart) {
-			canvas.drawText("TAP TO START", width/3, height-100.0f, greenPaint);
+			canvas.drawText("TAP TO START", width/3, height-100.0f, whitePaint);
 		}			
 	}
 
@@ -449,7 +475,7 @@ public class Game {
 		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
 		
-		canvas.drawText("GAME PAUSED", width/3, height/2, greenPaint);
+		canvas.drawText("GAME PAUSED", width/3, height/2, whitePaint);
 		
 		if (playerTap) {
 			playerTap = false;
@@ -514,7 +540,7 @@ public class Game {
 		// now draw it the screen
 		StringBuilder buf = new StringBuilder("SCORE: ");
 		buf.append(curScore);		
-		canvas.drawText(buf.toString(), 0, 40, greenPaint);
+		canvas.drawText(buf.toString(), 0, 40, whitePaint);
 	}
 	
 	public void restore(SharedPreferences savedState) {
