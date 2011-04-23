@@ -2,7 +2,11 @@ package com.android.sofla.drj;
 
 import java.util.Random;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.Log;
@@ -38,6 +42,12 @@ public class Game {
 	long spawnPastryTime;
 	final long SPAWN_PASTRY_TIME = 750;
 
+	
+	//
+	// the road 
+	//
+	Road road;
+	
 	//
 	// player input flag
 	//
@@ -98,6 +108,7 @@ public class Game {
 	Paint textPaint;
 	Paint clearPaint;
 	Paint greenPaint;
+	Paint emptyPaint;
 	
 	//
 	// random number generator
@@ -110,7 +121,18 @@ public class Game {
 	int width;
 	int height;
 	
-	public Game() {
+	
+	//
+	// bitmaps
+	//
+	Bitmap roadImage;
+	Bitmap dividerImage;
+	Bitmap pastryImage;
+	Bitmap droidJumpImage;
+	Bitmap [] droidImages;
+	final int MAX_DROID_IMAGES = 4;
+	
+	public Game(Context context) {
 		
 		//
 		// allocate resources needed by game
@@ -125,7 +147,14 @@ public class Game {
 		clearPaint.setARGB(255, 0, 0, 0);
 		clearPaint.setAntiAlias(true);
 		
-		rng = new Random();		
+		emptyPaint = new Paint();
+		
+		rng = new Random();
+		
+		//
+		// load images
+		//
+		loadImages(context);
 		
 		droid = new Droid(this);
 		
@@ -136,10 +165,30 @@ public class Game {
 		
 		pastry = new Pastry(this);
 		
+		road = new Road(this);
+
+				
 		//
 		// initialize the game
 		//
 		resetGame();
+	}
+	
+	private void loadImages(Context context) {
+		Resources res = context.getResources();
+		
+		roadImage = BitmapFactory.decodeResource(res, R.drawable.road);
+		dividerImage = BitmapFactory.decodeResource(res, R.drawable.divider);
+		
+		pastryImage = BitmapFactory.decodeResource(res, R.drawable.pastry);
+		
+		droidJumpImage = BitmapFactory.decodeResource(res, R.drawable.droidjump);
+		
+		droidImages = new Bitmap[MAX_DROID_IMAGES];		
+		droidImages[0] = BitmapFactory.decodeResource(res, R.drawable.droid0);
+		droidImages[1] = BitmapFactory.decodeResource(res, R.drawable.droid1);
+		droidImages[2] = BitmapFactory.decodeResource(res, R.drawable.droid2);
+		droidImages[3] = BitmapFactory.decodeResource(res, R.drawable.droid3);
 	}
 
 	public void setScreenSize(int width, int height) {
@@ -196,6 +245,8 @@ public class Game {
 		getReadyGoTime = 0;
 		
 		curScore = 0;
+		
+		road.reset();
 	}
 	
 	public void initGameOver() {
@@ -227,7 +278,10 @@ public class Game {
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
 		// draw ground
-		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
+		//canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
+		//canvas.drawBitmap(roadImage, 0, groundY, clearPaint);
+		road.update();
+		road.draw(canvas);
 
 		for (Pothole p : potholes) {
 			if (p.alive) {
@@ -280,7 +334,9 @@ public class Game {
 		canvas.drawText("SCORE: 0", 0, 40, greenPaint);
 		
 		// draw ground
-		canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
+		//canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
+		//canvas.drawBitmap(roadImage, 0, groundY, clearPaint);
+		road.draw(canvas);
 		
 		droid.draw(canvas);					
 	}

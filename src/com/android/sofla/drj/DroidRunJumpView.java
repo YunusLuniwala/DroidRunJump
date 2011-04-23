@@ -110,7 +110,7 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		Log.w("DRJ", "DroidRunJumpView Constructor Called");
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
-		game = new Game();
+		game = new Game(context);
 		thread = new DroidRunJumpThread(holder, context, game);		
 		setFocusable(true);
 		this.context = context;

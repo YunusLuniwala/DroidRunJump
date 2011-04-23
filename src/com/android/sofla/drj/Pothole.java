@@ -60,7 +60,7 @@ class Pothole {
 		this.id = id;
 		this.game = game;
 		y = game.groundY;
-		h = game.groundHeight;
+		h = game.groundHeight + 10.0f;
 		alive = false;
 	}	
 	

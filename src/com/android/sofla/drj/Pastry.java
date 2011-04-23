@@ -41,7 +41,7 @@ public class Pastry {
 		
 		x -= 10.0f;
 		rect.left = x;
-		rect.right = x + w;		
+		rect.right = x + w;
 		
 		//
 		// if pastry beyond left hand side of display then disable it
@@ -52,7 +52,7 @@ public class Pastry {
 	}
 
 	public void draw(Canvas canvas) {
-		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		canvas.drawBitmap(game.pastryImage, rect.left, rect.top, game.clearPaint);
 	}
 	
 	public void restore(SharedPreferences savedState) {

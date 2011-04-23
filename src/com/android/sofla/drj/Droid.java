@@ -24,6 +24,9 @@ class Droid {
 	Game game;
 	
 	RectF rect;
+	
+	int curFrame;
+	long curFrameTime = 0;
 
 	public Droid(Game game) {
 		this.game = game;
@@ -46,7 +49,10 @@ class Droid {
 		
 		// since droid is floating a little bit above the ground need
 		// to take this into account for collision purposes
-		yAdjust = game.groundY - y - h; 
+		yAdjust = game.groundY - y - h;
+		
+		curFrame = 0;
+		curFrameTime = System.currentTimeMillis();
 	}
 
 	public void update() {
@@ -77,10 +83,28 @@ class Droid {
 		if (game.playerTap && !jumping && !falling) {
 			startPlayerJump();
 		}
+		
+		//
+		// update animation
+		//
+		long now = System.currentTimeMillis() - curFrameTime;
+		if (now > 250) {
+			curFrame++;
+			if (curFrame > 3) {
+				curFrame = 1;
+			}
+			curFrameTime = System.currentTimeMillis();
+		}
 	}
 
 	public void draw(Canvas canvas) {
-		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		//canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		if (jumping || falling) {
+			canvas.drawBitmap(game.droidJumpImage, x, y, game.clearPaint);
+		}
+		else {
+			canvas.drawBitmap(game.droidImages[curFrame], x, y, game.clearPaint);
+		}
 	}
 	
 	//
