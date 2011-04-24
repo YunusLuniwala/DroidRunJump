@@ -1,6 +1,5 @@
 package com.android.sofla.drj;
 
-import java.io.IOException;
 import java.util.Random;
 
 import android.content.Context;
@@ -11,7 +10,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 
@@ -37,20 +35,7 @@ public class Game {
 	//
 	Droid droid;
 	final float groundY = 400;
-	final float groundHeight = 20;
-	
-	//
-	// Pastry
-	//
-	Pastry pastry;
-	long spawnPastryTime;
-	final long SPAWN_PASTRY_TIME = 750;
-
-	
-	//
-	// the road 
-	//
-	Road road;
+	final float groundHeight = 20;	
 	
 	//
 	// player input flag
@@ -64,8 +49,7 @@ public class Game {
 	final int GAME_READY = 1;
 	final int GAME_PLAY = 2;
 	final int GAME_OVER = 3;
-	final int GAME_PAUSE = 4;
-
+	
 	int gameState;
 
 	//
@@ -86,33 +70,13 @@ public class Game {
 	//
 	// game over message
 	//
-	long gameOverTime;
-	
-	//
-	// track time between save games
-	//
-	long saveGameTime;
-	
-	//
-	// hiscore
-	//
-	int highScore;
-	int curScore;
-	
-	long scoreTime;
-	final long SCORE_TIME = 100;
-	
-	final int SCORE_DEFAULT = 5000;
-	final int SCORE_INC = 5;
-	final int SCORE_PASTRY_BONUS = 200;
+	long gameOverTime;	
 
 	//
 	// shared paint objects for drawing
 	//
 	Paint textPaint;
 	Paint clearPaint;
-	Paint whitePaint;
-	Paint emptyPaint;
 	
 	//
 	// random number generator
@@ -126,30 +90,13 @@ public class Game {
 	int height;
 	
 	
-	//
-	// bitmaps
-	//
-	Bitmap roadImage;
-	Bitmap dividerImage;
-	Bitmap pastryImage;
-	Bitmap droidJumpImage;
-	Bitmap [] droidImages;
-	final int MAX_DROID_IMAGES = 4;
-	
-	//
-	// sound
-	//
-	SoundPool soundPool;
-	int droidJumpSnd;
-	int droidEatPastrySnd;
-	int droidCrashSnd;
-	
 
 	public Game(Context context) {
 			
 		//
 		// allocate resources needed by game
 		//
+		
 		whitePaint = new Paint();
 		whitePaint.setAntiAlias(true);
 		whitePaint.setARGB(255, 255, 255, 255);
@@ -159,15 +106,33 @@ public class Game {
 		clearPaint = new Paint();
 		clearPaint.setARGB(255, 0, 0, 0);
 		clearPaint.setAntiAlias(true);
+				
+		rng = new Random();
+		
+		//
+		// workshop 2
+		//
 		
 		emptyPaint = new Paint();
-		
-		rng = new Random();
 		
 		//
 		// load images
 		//
+
 		loadImages(context);
+
+		//
+		// load sounds
+		//
+		
+		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
+		loadSounds(context);
+		
+		// -- END workshop 2
+		
+		//
+		// create game entities
+		//
 		
 		droid = new Droid(this);
 		
@@ -176,16 +141,14 @@ public class Game {
 			potholes[i] = new Pothole(i, this);
 		}
 		
-		pastry = new Pastry(this);
+		//
+		// workshop 2
+		//
 		
+		pastry = new Pastry(this);		
 		road = new Road(this);
-
 		
-		//
-		// load sounds
-		//
-		soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0);
-		loadSounds(context);
+		// -- END workshop 2
 		
 				
 		//
@@ -194,29 +157,6 @@ public class Game {
 		resetGame();
 	}
 	
-	private void loadSounds(Context context) {
-		droidCrashSnd = soundPool.load(context, R.raw.droidcrash, 1);
-		droidEatPastrySnd = soundPool.load(context, R.raw.eatpastry, 1);
-		droidJumpSnd = soundPool.load(context, R.raw.droidjump, 1);		
-	}
-	
-	private void loadImages(Context context) {
-		Resources res = context.getResources();
-		
-		roadImage = BitmapFactory.decodeResource(res, R.drawable.road);
-		dividerImage = BitmapFactory.decodeResource(res, R.drawable.divider);
-		
-		pastryImage = BitmapFactory.decodeResource(res, R.drawable.pastry);
-		
-		droidJumpImage = BitmapFactory.decodeResource(res, R.drawable.droidjump);
-		
-		droidImages = new Bitmap[MAX_DROID_IMAGES];		
-		droidImages[0] = BitmapFactory.decodeResource(res, R.drawable.droid0);
-		droidImages[1] = BitmapFactory.decodeResource(res, R.drawable.droid1);
-		droidImages[2] = BitmapFactory.decodeResource(res, R.drawable.droid2);
-		droidImages[3] = BitmapFactory.decodeResource(res, R.drawable.droid3);
-	}
-
 	public void setScreenSize(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -236,10 +176,16 @@ public class Game {
 		case GAME_OVER:
 			gameOver(canvas);
 			break;
+			
+		//
+		// workshop 2
+		//
 		case GAME_PAUSE:
 			gamePause(canvas);
 			break;
 		}
+		// -- END workshop 2
+		
 	}
 	
 	public void doTouch() {
@@ -259,9 +205,6 @@ public class Game {
 			p.reset();
 		}
 		
-		pastry.reset();
-		spawnPastryTime = System.currentTimeMillis();
-		
 		lastPothole = null;
 		
 		gameState = GAME_MENU;
@@ -270,9 +213,18 @@ public class Game {
 		getReadyGoState = SHOW_GET_READY;
 		getReadyGoTime = 0;
 		
+		//
+		// workshop 2
+		//
+		
 		curScore = 0;
+
+		pastry.reset();
+		spawnPastryTime = System.currentTimeMillis();
 		
 		road.reset();
+		
+		// -- END workshop 2		
 	}
 	
 	public void initGameOver() {
@@ -280,10 +232,16 @@ public class Game {
 		gameState = GAME_OVER;
 		gameOverTime = System.currentTimeMillis();
 		
+		//
+		// workshop 2
+		//
+		
 		// update high score
 		if (curScore > highScore) {
 			highScore = curScore;
 		}
+		
+		// -- END workshop 2
 	}
 
 	private void gameOver(Canvas canvas) {
@@ -303,11 +261,15 @@ public class Game {
 		// clear screen
 		canvas.drawRect(0, 0, width, height, clearPaint);
 
+		//
+		// workshop 2
+		//
+		
 		// draw ground
-		//canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
-		//canvas.drawBitmap(roadImage, 0, groundY, clearPaint);
 		road.update();
 		road.draw(canvas);
+		
+		// --- END workshop 2
 
 		for (Pothole p : potholes) {
 			if (p.alive) {
@@ -316,18 +278,31 @@ public class Game {
 			}
 		}
 		
+		//
+		// workshop 2
+		//
+		
 		if (pastry.alive) {
 			pastry.update();
 			pastry.draw(canvas);
 		}
 		
+		// -- END workshop 2
+		
 		droid.update();
 		droid.draw(canvas);
 
 		spawnPothole();
+		
+		//
+		// workshop 2
+		//
+		
 		spawnPastry();
 		
-		doScore(canvas);		
+		doScore(canvas);
+		
+		// -- END workshop 2
 	}
 
 	private void gameReady(Canvas canvas) {
@@ -351,19 +326,30 @@ public class Game {
 			now = System.currentTimeMillis() - getReadyGoTime;
 			if (now > 500) {				
 				gameState = GAME_PLAY;
+				
+				//
+				// workshop 2
+				//
 				scoreTime = System.currentTimeMillis();
+				
+				// -- END workshop 2				
 			}
 			break;
 		}
 		
 		// draw blank score
 		canvas.drawText("SCORE: 0", 0, 40, whitePaint);
+
+		//
+		// workshop 2
+		//
 		
 		// draw ground
-		//canvas.drawRect(0, groundY, width, groundY+groundHeight, greenPaint);
-		//canvas.drawBitmap(roadImage, 0, groundY, clearPaint);
 		road.draw(canvas);
 		
+		// -- END workshop 2
+		
+		// draw player
 		droid.draw(canvas);					
 	}
 
@@ -464,11 +450,88 @@ public class Game {
 	}
 	
 	//
-	// workshop2 code
+	// workshop2
 	//
 	
+	Paint whitePaint;
+	Paint emptyPaint;
+	
+	final int GAME_PAUSE = 4;
+	
+	//
+	// track time between save games
+	//
+	long saveGameTime;
+	
+	//
+	// hiscore
+	//
+	int highScore;
+	int curScore;
+	
+	long scoreTime;
+	final long SCORE_TIME = 100;
+	
+	final int SCORE_DEFAULT = 5000;
+	final int SCORE_INC = 5;
+	final int SCORE_PASTRY_BONUS = 200;
+	
+	//
+	// Pastry
+	//
+	Pastry pastry;
+	long spawnPastryTime;
+	final long SPAWN_PASTRY_TIME = 750;
+
+	
+	//
+	// the road 
+	//
+	Road road;
+	
+	//
+	// bitmaps
+	//
+	Bitmap roadImage;
+	Bitmap dividerImage;
+	Bitmap pastryImage;
+	Bitmap droidJumpImage;
+	Bitmap [] droidImages;
+	final int MAX_DROID_IMAGES = 4;
+	
+	//
+	// sound
+	//
+	SoundPool soundPool;
+	int droidJumpSnd;
+	int droidEatPastrySnd;
+	int droidCrashSnd;
+
 	int lastGameState;
 	long pauseStartTime;
+		
+	private void loadSounds(Context context) {
+		droidCrashSnd = soundPool.load(context, R.raw.droidcrash, 1);
+		droidEatPastrySnd = soundPool.load(context, R.raw.eatpastry, 1);
+		droidJumpSnd = soundPool.load(context, R.raw.droidjump, 1);		
+	}
+	
+	private void loadImages(Context context) {
+		Resources res = context.getResources();
+		
+		roadImage = BitmapFactory.decodeResource(res, R.drawable.road);
+		dividerImage = BitmapFactory.decodeResource(res, R.drawable.divider);
+		
+		pastryImage = BitmapFactory.decodeResource(res, R.drawable.pastry);
+		
+		droidJumpImage = BitmapFactory.decodeResource(res, R.drawable.droidjump);
+		
+		droidImages = new Bitmap[MAX_DROID_IMAGES];		
+		droidImages[0] = BitmapFactory.decodeResource(res, R.drawable.droid0);
+		droidImages[1] = BitmapFactory.decodeResource(res, R.drawable.droid1);
+		droidImages[2] = BitmapFactory.decodeResource(res, R.drawable.droid2);
+		droidImages[3] = BitmapFactory.decodeResource(res, R.drawable.droid3);
+	}
 	
 	private void gamePause(Canvas canvas) {
 
@@ -554,7 +617,7 @@ public class Game {
 		if (savedGame == false) {
 			
 			//
-			// only need to fetch highscore
+			// only need to fetch high score
 			//
 			highScore = savedState.getInt("game_highScore", SCORE_DEFAULT);
 			
@@ -606,6 +669,8 @@ public class Game {
 		
 		pastry.restore(savedState);
 		
+		road.restore(savedState);
+		
 		editor.commit();
 	}
 	
@@ -618,7 +683,7 @@ public class Game {
 		Log.w("DRJ", "save method called");
 
 		//
-		// only highscore needs to be saved
+		// only high score needs to be saved
 		//
 		if (onlyHighScore) {
 			map.putInt("game_highScore", highScore);
@@ -662,6 +727,8 @@ public class Game {
 		}
 		
 		pastry.save(map);
+		
+		road.save(map);
 		
 		//
 		// store saved variables

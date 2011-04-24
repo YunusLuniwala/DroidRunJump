@@ -1,5 +1,6 @@
 package com.android.sofla.drj;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 
 public class Road {
@@ -43,4 +44,26 @@ public class Road {
 			canvas.drawBitmap(game.dividerImage, dividerX[i], y+10.0f, game.emptyPaint);			
 		}		
 	}
+	
+	public void restore(SharedPreferences savedState) {
+		/*
+		x = savedState.getFloat("droid_x", 0);
+		y = savedState.getFloat("droid_y", 0);
+		vy = savedState.getFloat("droid_vy", 0);
+		jumping = savedState.getBoolean("droid_jumping", false);
+		falling = savedState.getBoolean("droid_falling", false);
+		yAdjust = savedState.getFloat("droid_yAdjust", 0);
+		*/
+	}
+	
+	public void save(SharedPreferences.Editor map) {
+		/*
+		map.putFloat("droid_x", x);
+		map.putFloat("droid_y", y);
+		map.putFloat("droid_vy", vy);
+		map.putBoolean("droid_jumping", jumping);
+		map.putBoolean("droid_falling", falling);
+		map.putFloat("droid_yAdjust", yAdjust);
+		*/
+	}	
 }

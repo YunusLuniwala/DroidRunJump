@@ -189,7 +189,9 @@ class Droid {
 		vy = savedState.getFloat("droid_vy", 0);
 		jumping = savedState.getBoolean("droid_jumping", false);
 		falling = savedState.getBoolean("droid_falling", false);
-		yAdjust = savedState.getFloat("droid_yAdjust", 0);
+		yAdjust = savedState.getFloat("droid_yAdjust", 0);		
+		curFrame = savedState.getInt("droid_curFrame", 0);
+		curFrameTime = savedState.getLong("droid_curFrameTime",0 );		
 	}
 	
 	public void save(SharedPreferences.Editor map) {
@@ -198,6 +200,8 @@ class Droid {
 		map.putFloat("droid_vy", vy);
 		map.putBoolean("droid_jumping", jumping);
 		map.putBoolean("droid_falling", falling);
-		map.putFloat("droid_yAdjust", yAdjust);
+		map.putFloat("droid_yAdjust", yAdjust);		
+		map.putInt("droid_curFrame", curFrame);
+		map.putLong("droid_curFrameTime", curFrameTime);
 	}	
 }
