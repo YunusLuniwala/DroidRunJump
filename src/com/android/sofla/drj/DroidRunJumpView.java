@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -75,7 +74,7 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		}
 		
 		//
-		// workshop2 code
+		// workshop2
 		//
 		
 		public void pause() {
@@ -96,24 +95,40 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 				game.save(editor, onlyHighScore);				
 			}
 		}
+		
+		// -- END workshop 2
 	}
 	
 	//
 	// game view
 	//
 	private DroidRunJumpThread thread;
+	
+	//
+	// workshop 2
+	//
 	private Context context;
 	private Game game;
 	
+	// -- END workshop 2
+	
 	public DroidRunJumpView(Context context, AttributeSet attrs) {		
 		super(context, attrs);
-		Log.w("DRJ", "DroidRunJumpView Constructor Called");
+		
 		SurfaceHolder holder = getHolder();
 		holder.addCallback(this);
-		game = new Game(context);
-		thread = new DroidRunJumpThread(holder, context, game);		
-		setFocusable(true);
+		
+		//
+		// workshop2 
+		//
+		
 		this.context = context;
+		game = new Game(context);
+		thread = new DroidRunJumpThread(holder, context, game);
+		
+		// -- END workshop 2
+		
+		setFocusable(true);		
 	}
 
 	
@@ -124,11 +139,16 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 
 	
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.w("DRJ", "surfaceCreated called");
+		
+		//
+		// workshop 2
+		//
 		
 		if (!thread.run) {
 			thread = new DroidRunJumpThread(holder, context, game);
 		}
+		
+		// -- END workshop 2
 		
 		thread.setRunning(true);
 		thread.start();

@@ -27,7 +27,7 @@ public class DroidRunJumpActivity extends Activity {
        	SharedPreferences.Editor editor = settings.edit();  
     	
     	if (isFinishing()) {
-    		// just save highscore if player is exiting
+    		// just save high score if player is exiting
     		drjView.getThread().saveGame(editor, true);
     		return;    	
     	}
