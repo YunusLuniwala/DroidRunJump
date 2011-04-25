@@ -12,14 +12,12 @@ class Droid {
 	boolean jumping;
 	boolean falling;
 	
-	final float w = 40.0f;
-	final float h = 45.0f;
+	float w;
+	float h;
 	
 	final float startX = 380.0f;
 	final float startY = 352.5f;
 	final float initialVelocity = 15.0f;
-	
-	float yAdjust;
 	
 	Game game;
 	
@@ -31,7 +29,10 @@ class Droid {
 	public Droid(Game game) {
 		this.game = game;
 		this.rect = new RectF();
-		reset();		
+		reset();
+		
+		w = game.droidJumpImage.getWidth();
+		h = game.droidJumpImage.getHeight();
 	}
 
 	public void reset() {
@@ -46,10 +47,6 @@ class Droid {
 		rect.top = y;
 		rect.bottom = y + h;
 		rect.right = x + w;
-		
-		// since droid is floating a little bit above the ground need
-		// to take this into account for collision purposes
-		yAdjust = game.groundY - y - h;
 		
 		curFrame = 0;
 		curFrameTime = System.currentTimeMillis();
@@ -113,7 +110,7 @@ class Droid {
 	//
 	private void doCollisionDetection() {
 
-		float ey = y + h + yAdjust;
+		float ey = y + h;
 
 		for (Pothole p : game.potholes) {
 			if (!p.alive) {
@@ -186,8 +183,7 @@ class Droid {
 		y = savedState.getFloat("droid_y", 0);
 		vy = savedState.getFloat("droid_vy", 0);
 		jumping = savedState.getBoolean("droid_jumping", false);
-		falling = savedState.getBoolean("droid_falling", false);
-		yAdjust = savedState.getFloat("droid_yAdjust", 0);		
+		falling = savedState.getBoolean("droid_falling", false);			
 		curFrame = savedState.getInt("droid_curFrame", 0);
 		curFrameTime = savedState.getLong("droid_curFrameTime",0 );		
 	}
@@ -198,7 +194,6 @@ class Droid {
 		map.putFloat("droid_vy", vy);
 		map.putBoolean("droid_jumping", jumping);
 		map.putBoolean("droid_falling", falling);
-		map.putFloat("droid_yAdjust", yAdjust);		
 		map.putInt("droid_curFrame", curFrame);
 		map.putLong("droid_curFrameTime", curFrameTime);
 	}	

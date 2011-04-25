@@ -15,8 +15,9 @@ public class Pastry {
 
 	public Pastry(Game game) {		
 		this.game = game;
-		this.w = 20.0f;
-		this.h = 20.0f;
+
+		w = game.pastryImage.getWidth();
+		h = game.pastryImage.getHeight();
 		
 		rect = new RectF();
 	}

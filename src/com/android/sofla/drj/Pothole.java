@@ -11,8 +11,7 @@ class Pothole {
 	boolean alive;
 	
 	Game game;
-
-
+	
 	public void reset() {		
 		alive = false;
 	}

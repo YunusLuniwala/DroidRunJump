@@ -7,7 +7,6 @@ public class Road {
 	
 	Game game;
 	float y;
-	float h;
 		
 	final int MAX_DIVIDERS = 11;
 	float [] dividerX;
@@ -15,7 +14,6 @@ public class Road {
 	public Road(Game game) {
 		this.game = game;
 		y = game.groundY;
-		h = game.groundHeight;
 		
 		dividerX = new float[MAX_DIVIDERS];		
 	}
