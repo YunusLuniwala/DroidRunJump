@@ -135,8 +135,7 @@ class Droid {
 				
 				) {
 				
-				game.initGameOver();
-				game.soundPool.play(game.droidCrashSnd, 1.0f, 1.0f, 0, 0, 1.0f);
+				game.initGameOver();				
 			}
 		}
 		
@@ -149,8 +148,7 @@ class Droid {
 		rect.right = x + w;
 		
 		if (game.pastry.alive && rect.intersect(game.pastry.rect)) {
-			game.doPlayerEatPastry();
-			game.soundPool.play(game.droidEatPastrySnd, 1.0f, 1.0f, 0, 0, 1.0f);
+			game.doPlayerEatPastry();			
 		}
 	}
 	

@@ -45,25 +45,15 @@ public class Road {
 		}		
 	}
 	
-	public void restore(SharedPreferences savedState) {
-		/*
-		x = savedState.getFloat("droid_x", 0);
-		y = savedState.getFloat("droid_y", 0);
-		vy = savedState.getFloat("droid_vy", 0);
-		jumping = savedState.getBoolean("droid_jumping", false);
-		falling = savedState.getBoolean("droid_falling", false);
-		yAdjust = savedState.getFloat("droid_yAdjust", 0);
-		*/
+	public void restore(SharedPreferences savedState) {		
+		for (int i=0; i<MAX_DIVIDERS; i++) {
+			dividerX[i] = savedState.getFloat("road_div_" + i + "_x", 0);
+		}
 	}
 	
 	public void save(SharedPreferences.Editor map) {
-		/*
-		map.putFloat("droid_x", x);
-		map.putFloat("droid_y", y);
-		map.putFloat("droid_vy", vy);
-		map.putBoolean("droid_jumping", jumping);
-		map.putBoolean("droid_falling", falling);
-		map.putFloat("droid_yAdjust", yAdjust);
-		*/
+		for (int i=0; i<MAX_DIVIDERS; i++) {
+			map.putFloat("road_div_" + i + "_x", dividerX[i]);
+		}
 	}	
 }

@@ -236,6 +236,9 @@ public class Game {
 		// workshop 2
 		//
 		
+		// play droid crash sound
+		soundPool.play(droidCrashSnd, 1.0f, 1.0f, 0, 0, 1.0f);
+		
 		// update high score
 		if (curScore > highScore) {
 			highScore = curScore;
@@ -581,6 +584,7 @@ public class Game {
 	
 	public void doPlayerEatPastry() {
 		// play eat pastry sound
+		soundPool.play(droidEatPastrySnd, 1.0f, 1.0f, 0, 0, 1.0f);
 		
 		// increase score
 		curScore += SCORE_PASTRY_BONUS;
@@ -590,7 +594,7 @@ public class Game {
 		spawnPastryTime = System.currentTimeMillis();
 	}
 	
-	public void doScore(Canvas canvas) {
+	private void doScore(Canvas canvas) {
 		
 		// first update current score
 		long now = System.currentTimeMillis() - scoreTime;
