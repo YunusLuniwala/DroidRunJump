@@ -59,7 +59,7 @@ class Pothole {
 		this.id = id;
 		this.game = game;
 		y = game.groundY;
-		h = game.groundHeight + 10.0f;
+		h = game.roadImage.getHeight();
 		alive = false;
 	}	
 	
