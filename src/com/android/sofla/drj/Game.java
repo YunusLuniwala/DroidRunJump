@@ -11,7 +11,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
 
 
 public class Game {
@@ -563,8 +562,7 @@ public class Game {
 			getReadyGoTime += deltaTime;
 			gameOverTime += deltaTime;
 			scoreTime += deltaTime;
-			
-			Log.w("DRJ", "un-Pause game: " + gameState);
+			spawnPastryTime += deltaTime;
 		}
 	}
 	
@@ -572,7 +570,6 @@ public class Game {
 		lastGameState = gameState;
 		gameState = GAME_PAUSE;
 		pauseStartTime = System.currentTimeMillis();
-		Log.w("DRJ", "pause method called");
 	}
 		
 	void spawnPastry() {		
@@ -618,8 +615,6 @@ public class Game {
 	}
 	
 	public void restore(SharedPreferences savedState) {
-		
-		Log.w("DRJ", "restore method called");
 		
 		// restore game vars
 		
@@ -689,9 +684,7 @@ public class Game {
 		
 		if (map == null) {			
 			return;
-		}
-		
-		Log.w("DRJ", "save method called");
+		}		
 
 		//
 		// only high score needs to be saved

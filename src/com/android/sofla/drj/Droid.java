@@ -20,19 +20,32 @@ class Droid {
 	final float initialVelocity = 15.0f;
 	
 	Game game;
+
+	//
+	// workshop 2
+	//
 	
 	RectF rect;
 	
 	int curFrame;
 	long curFrameTime = 0;
+	
+	// -- END workshop 2
 
 	public Droid(Game game) {
 		this.game = game;
+		
+		//
+		// workshop 2
+		//
 		this.rect = new RectF();
-		reset();
 		
 		w = game.droidJumpImage.getWidth();
 		h = game.droidJumpImage.getHeight();
+		
+		// -- END workshop 2
+		
+		reset();
 	}
 
 	public void reset() {
@@ -83,6 +96,10 @@ class Droid {
 		}
 		
 		//
+		// workshop 2
+		//
+		
+		//
 		// update animation
 		//
 		long now = System.currentTimeMillis() - curFrameTime;
@@ -93,16 +110,25 @@ class Droid {
 			}
 			curFrameTime = System.currentTimeMillis();
 		}
+		
+		// -- END workshop 2
 	}
 
 	public void draw(Canvas canvas) {
 		//canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		
+		//
+		// workshop 2
+		//
+
 		if (jumping || falling) {
 			canvas.drawBitmap(game.droidJumpImage, x, y, game.clearPaint);
 		}
 		else {
 			canvas.drawBitmap(game.droidImages[curFrame], x, y, game.clearPaint);
 		}
+		
+		// -- END workshop 2
 	}
 	
 	//
@@ -137,6 +163,10 @@ class Droid {
 		}
 		
 		//
+		// workshop 2
+		//
+		
+		//
 		// check for pastry collision
 		//
 		rect.left = x;
@@ -147,6 +177,8 @@ class Droid {
 		if (game.pastry.alive && rect.intersect(game.pastry.rect)) {
 			game.doPlayerEatPastry();			
 		}
+		
+		// -- END workshop 2
 	}
 	
 	private void doPlayerFall() {
@@ -175,7 +207,7 @@ class Droid {
 	}
 	
 	//
-	// workshop 2 code
+	// workshop 2
 	//
 
 	public void restore(SharedPreferences savedState) {
@@ -196,5 +228,7 @@ class Droid {
 		map.putBoolean("droid_falling", falling);
 		map.putInt("droid_curFrame", curFrame);
 		map.putLong("droid_curFrameTime", curFrameTime);
-	}	
+	}
+	
+	// -- END workshop 2
 }
