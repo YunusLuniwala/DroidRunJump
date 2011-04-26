@@ -75,7 +75,8 @@ public class Game {
 	//
 	// shared paint objects for drawing
 	//
-	Paint textPaint;
+	
+	Paint greenPaint;
 	Paint clearPaint;
 	
 	//
@@ -97,11 +98,11 @@ public class Game {
 		// allocate resources needed by game
 		//
 		
-		whitePaint = new Paint();
-		whitePaint.setAntiAlias(true);
-		whitePaint.setARGB(255, 255, 255, 255);
-		whitePaint.setFakeBoldText(true);		
-		whitePaint.setTextSize(42.0f);
+		greenPaint = new Paint();
+		greenPaint.setAntiAlias(true);
+		greenPaint.setARGB(255, 0, 255, 0);
+		greenPaint.setFakeBoldText(true);		
+		greenPaint.setTextSize(42.0f);
 
 		clearPaint = new Paint();
 		clearPaint.setARGB(255, 0, 0, 0);
@@ -145,6 +146,12 @@ public class Game {
 		// workshop 2
 		//
 		
+		whitePaint = new Paint();
+		whitePaint.setAntiAlias(true);
+		whitePaint.setARGB(255, 255, 255, 255);
+		whitePaint.setFakeBoldText(true);		
+		whitePaint.setTextSize(42.0f);
+				
 		pastry = new Pastry(this);		
 		road = new Road(this);
 		
