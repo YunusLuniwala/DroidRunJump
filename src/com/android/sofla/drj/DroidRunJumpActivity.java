@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-
 import com.android.sofla.drj.DroidRunJumpView.DroidRunJumpThread;
 
 

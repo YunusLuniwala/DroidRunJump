@@ -113,15 +113,17 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 	//
 	// workshop 2
 	//
+	
 	private Context context;
 	private Game game;
+	private SurfaceHolder holder;
 	
 	// -- END workshop 2
 	
 	public DroidRunJumpView(Context context, AttributeSet attrs) {		
 		super(context, attrs);
 		
-		SurfaceHolder holder = getHolder();
+		holder = getHolder();
 		holder.addCallback(this);
 		
 		//
@@ -129,32 +131,21 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 		//
 		
 		this.context = context;
-		game = new Game(context);
-		thread = new DroidRunJumpThread(holder, context, game);		
+		game = new Game(context);			
+		
+		thread = null;
 		
 		// -- END workshop 2
 		
 		setFocusable(true);		
 	}
 
-	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
 		thread.setSurfaceSize(width, height);
 	}
-
 	
 	public void surfaceCreated(SurfaceHolder holder) {
-		//
-		// workshop 2
-		//
-		
-		if (!thread.run) {
-			thread = new DroidRunJumpThread(holder, context, game);
-		}
-		
-		// -- END workshop 2
-		
 		thread.setRunning(true);
 		thread.start();
 	}
@@ -169,6 +160,14 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 			} catch (InterruptedException e) {
 			}
 		}
+
+		//
+		// workshop2 
+		//
+		
+		thread = null;
+		
+		// -- END workshop 2
 	}
 	
 	public boolean onTouchEvent(MotionEvent event) {
@@ -180,6 +179,9 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 	//
 	
 	public DroidRunJumpThread getThread() {
+		if (thread == null) {
+			thread = new DroidRunJumpThread(holder, context, game);
+		}
 		return thread;
 	}
 	
