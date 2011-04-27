@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -85,15 +84,21 @@ public class DroidRunJumpView extends SurfaceView implements SurfaceHolder.Callb
 			}
 		}
 		
+		public void resetGame() {
+			synchronized (surfaceHolder) {
+				game.resetGame();
+			}
+		}
+		
 		public void restoreGame(SharedPreferences savedInstanceState) {
 			synchronized (surfaceHolder) {
 				game.restore(savedInstanceState);
 			}
 		}
 
-		public void saveGame(SharedPreferences.Editor editor, boolean onlyHighScore) {
+		public void saveGame(SharedPreferences.Editor editor) {
 			synchronized (surfaceHolder) {
-				game.save(editor, onlyHighScore);				
+				game.save(editor);
 			}
 		}
 		

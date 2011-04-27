@@ -5,16 +5,20 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 
+import com.android.sofla.drj.DroidRunJumpView.DroidRunJumpThread;
+
+
 public class DroidRunJumpActivity extends Activity {
 	
 	public static final String PREFS_NAME = "DRJPrefsFile";
 	
 	DroidRunJumpView drjView;
+	DroidRunJumpThread drjThread;
 	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);        
         setContentView(R.layout.main);        
         drjView = (DroidRunJumpView) findViewById(R.id.droidrunjump);                       
     }
@@ -24,25 +28,27 @@ public class DroidRunJumpActivity extends Activity {
     	super.onPause();
 
     	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-       	SharedPreferences.Editor editor = settings.edit();  
-    	
+       	SharedPreferences.Editor editor = settings.edit();
+       	
+       	drjThread = drjView.getThread();
+       	       	    	
+       	// if player wants to quit then reset the game
     	if (isFinishing()) {
-    		// just save high score if player is exiting
-    		drjView.getThread().saveGame(editor, true);
-    		return;    	
+    		drjThread.resetGame();
+    	}
+    	else {	    	
+    		drjThread.pause();
     	}
     	
-   		// save game       	
-       	drjView.getThread().pause();
-       	drjView.getThread().saveGame(editor, false);       	
+       	drjThread.saveGame(editor);
     }
     
     @Override
     protected void onResume() {
-    	super.onResume();
-    	
+    	super.onResume();    
     	// restore game
-    	SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-   		drjView.getThread().restoreGame(settings);
-    }    
+    	drjThread = drjView.getThread();    
+	    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+	   	drjThread.restoreGame(settings);  
+    }   
 }

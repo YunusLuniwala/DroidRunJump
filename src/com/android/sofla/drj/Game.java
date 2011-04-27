@@ -154,6 +154,8 @@ public class Game {
 		pastry = new Pastry(this);		
 		road = new Road(this);
 		
+		highScore = SCORE_DEFAULT;
+		
 		// -- END workshop 2
 		
 				
@@ -194,11 +196,11 @@ public class Game {
 		
 	}
 	
-	public void doTouch() {
+	public void doTouch() {		
 		playerTap = true;
 	}
 
-	private void resetGame() {
+	public void resetGame() {
 		tapToStartTime = System.currentTimeMillis();
 		showTapToStart = true;
 		
@@ -549,10 +551,10 @@ public class Game {
 		
 		canvas.drawText("GAME PAUSED", width/3, height/2, whitePaint);
 		
-		if (playerTap) {
+		if (playerTap) {			
 			playerTap = false;
 			gameState = lastGameState;
-
+			
 			// determine time elapsed between pause and unpause
 			long deltaTime = System.currentTimeMillis() - pauseStartTime;
 			
@@ -567,6 +569,13 @@ public class Game {
 	}
 	
 	public void pause() {
+		
+		// if game already paused don't pause it again - otherwise we'll lose the
+		// game state and end up in an infinite loop
+		if (gameState == GAME_PAUSE) {
+			return;
+		}
+		
 		lastGameState = gameState;
 		gameState = GAME_PAUSE;
 		pauseStartTime = System.currentTimeMillis();
@@ -615,35 +624,25 @@ public class Game {
 	}
 	
 	public void restore(SharedPreferences savedState) {
+		//
+		// start restoring game variables
+		//
 		
-		// restore game vars
-		
-		boolean savedGame = savedState.getBoolean("savedGame", false);
-		
-		if (savedGame == false) {
-			
-			//
-			// only need to fetch high score
-			//
-			highScore = savedState.getInt("game_highScore", SCORE_DEFAULT);
-			
+		if (savedState.getInt("game_saved", 0) != 1) {
 			return;
 		}
-
-		//
-		// first clear saved game state in case player doesn't do a save when they exit
-		//
+		
 		SharedPreferences.Editor editor = savedState.edit();
-		editor.remove("savedGame");
-				
-		//
-		// now start restoring game variables
-		//
+		editor.remove("game_saved");
+		editor.commit();				
+		
+		highScore = savedState.getInt("game_highScore", SCORE_DEFAULT);
 		
 		int lastPotholeId = savedState.getInt("game_lastPotHole_id", -1);
 		
 		if (lastPotholeId != -1) {
 			lastPothole = potholes[lastPotholeId];
+			
 		}
 		else {
 			lastPothole = null;
@@ -676,26 +675,17 @@ public class Game {
 		pastry.restore(savedState);
 		
 		road.restore(savedState);
-		
-		editor.commit();
 	}
 	
-	public void save(SharedPreferences.Editor map, boolean onlyHighScore) {
+	public void save(SharedPreferences.Editor map) {
 		
 		if (map == null) {			
 			return;
-		}		
-
-		//
-		// only high score needs to be saved
-		//
-		if (onlyHighScore) {
-			map.putInt("game_highScore", highScore);
-			map.commit();
-			return;			
 		}
 		
-		map.putBoolean("savedGame", true);
+		map.putInt("game_saved", 1);
+
+		map.putInt("game_highScore", highScore);		
 		
 		// save game vars
 		if (lastPothole == null) {
