@@ -1,8 +1,8 @@
 package com.android.sofla.drj;
 
-import com.android.sofla.drj.Pothole;
-
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.RectF;
 
 class Droid {
 
@@ -12,20 +12,40 @@ class Droid {
 	boolean jumping;
 	boolean falling;
 	
-	final float w = 40.0f;
-	final float h = 45.0f;
+	float w;
+	float h;
 	
 	final float startX = 380.0f;
 	final float startY = 352.5f;
 	final float initialVelocity = 15.0f;
 	
-	float yAdjust;
-	
 	Game game;
 
-	public Droid(Game game) {		
+	//
+	// workshop 2
+	//
+	
+	RectF rect;
+	
+	int curFrame;
+	long curFrameTime = 0;
+	
+	// -- END workshop 2
+
+	public Droid(Game game) {
 		this.game = game;
-		reset();		
+		
+		//
+		// workshop 2
+		//
+		this.rect = new RectF();
+		
+		w = game.droidJumpImage.getWidth();
+		h = game.droidJumpImage.getHeight();
+		
+		// -- END workshop 2
+		
+		reset();
 	}
 
 	public void reset() {
@@ -36,19 +56,22 @@ class Droid {
 		x = startX;
 		y = startY;
 		
-		// since droid is floating a little bit above the ground need
-		// to take this into account for collision purposes
-		yAdjust = game.groundY - y - h; 
+		rect.left = x;
+		rect.top = y;
+		rect.bottom = y + h;
+		rect.right = x + w;
+		
+		curFrame = 0;
+		curFrameTime = System.currentTimeMillis();
 	}
 
 	public void update() {
 
 		//
-		// first: handle collision detection with potholes
-		//
-		if (!jumping) {
-			doCollisionDetection();
-		}
+		// first: handle collision detection with pastry and potholes
+		//		
+		doCollisionDetection();
+
 
 		//
 		// handle falling
@@ -69,11 +92,43 @@ class Droid {
 		//
 		if (game.playerTap && !jumping && !falling) {
 			startPlayerJump();
+			game.soundPool.play(game.droidJumpSnd, 1.0f, 1.0f, 0, 0, 1.0f);
 		}
+		
+		//
+		// workshop 2
+		//
+		
+		//
+		// update animation
+		//
+		long now = System.currentTimeMillis() - curFrameTime;
+		if (now > 250) {
+			curFrame++;
+			if (curFrame > 3) {
+				curFrame = 1;
+			}
+			curFrameTime = System.currentTimeMillis();
+		}
+		
+		// -- END workshop 2
 	}
 
 	public void draw(Canvas canvas) {
-		canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		//canvas.drawRect(x, y, x + w, y + h, game.greenPaint);
+		
+		//
+		// workshop 2
+		//
+
+		if (jumping || falling) {
+			canvas.drawBitmap(game.droidJumpImage, x, y, game.clearPaint);
+		}
+		else {
+			canvas.drawBitmap(game.droidImages[curFrame], x, y, game.clearPaint);
+		}
+		
+		// -- END workshop 2
 	}
 	
 	//
@@ -81,7 +136,7 @@ class Droid {
 	//
 	private void doCollisionDetection() {
 
-		float ey = y + h + yAdjust;
+		float ey = y + h;
 
 		for (Pothole p : game.potholes) {
 			if (!p.alive) {
@@ -105,7 +160,25 @@ class Droid {
 				
 				game.initGameOver();				
 			}
-		}		
+		}
+		
+		//
+		// workshop 2
+		//
+		
+		//
+		// check for pastry collision
+		//
+		rect.left = x;
+		rect.top = y;
+		rect.bottom = y + h;
+		rect.right = x + w;
+		
+		if (game.pastry.alive && rect.intersect(game.pastry.rect)) {
+			game.doPlayerEatPastry();			
+		}
+		
+		// -- END workshop 2
 	}
 	
 	private void doPlayerFall() {
@@ -132,5 +205,30 @@ class Droid {
 		game.playerTap = false;
 		vy = initialVelocity;		
 	}
+	
+	//
+	// workshop 2
+	//
 
+	public void restore(SharedPreferences savedState) {
+		x = savedState.getFloat("droid_x", 0);
+		y = savedState.getFloat("droid_y", 0);
+		vy = savedState.getFloat("droid_vy", 0);
+		jumping = savedState.getBoolean("droid_jumping", false);
+		falling = savedState.getBoolean("droid_falling", false);			
+		curFrame = savedState.getInt("droid_curFrame", 0);
+		curFrameTime = savedState.getLong("droid_curFrameTime",0 );		
+	}
+	
+	public void save(SharedPreferences.Editor map) {
+		map.putFloat("droid_x", x);
+		map.putFloat("droid_y", y);
+		map.putFloat("droid_vy", vy);
+		map.putBoolean("droid_jumping", jumping);
+		map.putBoolean("droid_falling", falling);
+		map.putInt("droid_curFrame", curFrame);
+		map.putLong("droid_curFrameTime", curFrameTime);
+	}
+	
+	// -- END workshop 2
 }

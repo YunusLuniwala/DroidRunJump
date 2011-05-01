@@ -4,9 +4,16 @@ A simple run-n-jump game for the Android.
 
 Developed using the Android 2.2 SDK.
 
+Sound Effects Made using SFXR: http://www.drpetter.se/project_sfxr.html
+
+Graphics based on Android media kit images.
+
 
 License Information
 ===================
 
 Droid-Run-Jump is released under the MIT license. See LICENSE.txt.
 
+The Droid and Pastry graphics are modifications based on work created 
+and shared by Google and used according to terms described in the
+Creative Commons 3.0 Attribution License.

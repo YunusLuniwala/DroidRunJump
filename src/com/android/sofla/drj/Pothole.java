@@ -1,6 +1,8 @@
 package com.android.sofla.drj;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
+
 
 class Pothole {
 
@@ -9,14 +11,7 @@ class Pothole {
 	boolean alive;
 	
 	Game game;
-
-	public Pothole(Game game) {		
-		alive = false;
-		this.game = game;
-		y = game.groundY;
-		h = game.groundHeight;
-	}
-
+	
 	public void reset() {		
 		alive = false;
 	}
@@ -52,5 +47,35 @@ class Pothole {
 
 	public void draw(Canvas canvas) {
 		canvas.drawRect(x, y, x + w, y + h, game.clearPaint);
+	}
+
+	//
+	// workshop 2 code
+	//
+	
+	int id;
+
+	public Pothole(int id, Game game) {		
+		this.id = id;
+		this.game = game;
+		y = game.groundY;
+		h = game.roadImage.getHeight();
+		alive = false;
+	}	
+	
+	public void restore(SharedPreferences savedState) {
+		x = savedState.getFloat("ph_" + id + "_x", 0);
+		y = savedState.getFloat("ph_" + id + "_y", 0);
+		w = savedState.getFloat("ph_" + id + "_w", 0);
+		h = savedState.getFloat("ph_" + id + "_h", 0);
+		alive = savedState.getBoolean("ph_" + id + "_alive", false);
+	}
+	
+	public void save(SharedPreferences.Editor map) {		
+		map.putFloat("ph_" + id + "_x", x);
+		map.putFloat("ph_" + id + "_y", y);
+		map.putFloat("ph_" + id + "_w", w);
+		map.putFloat("ph_" + id + "_h", h);
+		map.putBoolean("ph_" + id + "_alive", alive);
 	}
 }
